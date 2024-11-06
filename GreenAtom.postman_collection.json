@@ -1,0 +1,205 @@
+{
+	"info": {
+		"_postman_id": "35f71fba-5be2-427d-a7ac-21ebf0b4c769",
+		"name": "GreenAtom",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28708777"
+	},
+	"item": [
+		{
+			"name": "Organization",
+			"item": [
+				{
+					"name": "AddOrganization",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Организация 1\",\r\n    \"capacity\": {\r\n        \"Стекло\": [0, 100],\r\n        \"Биоотходы\": [0, 150],\r\n        \"Пластик\": [0, 20]\r\n    }\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/organisations/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"organisations",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetOrganisations",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/organisations/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"organisations",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteOrganisations",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/organisations/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"organisations",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Storage",
+			"item": [
+				{
+					"name": "CreateStorage",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"МНО1\",\r\n    \"location\": \"Москва\",\r\n    \"capacity\": {\r\n        \"биоотходы\": [0, 300],\r\n        \"стекло\": [0, 100],\r\n        \"пластик\": [0, 150]\r\n    }\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8001/api/storages",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8001",
+							"path": [
+								"api",
+								"storages"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetStorages",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8001/api/storages/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8001",
+							"path": [
+								"api",
+								"storages",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateStorageDistance",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"storage_id\": 1,\r\n    \"organisation_id\": 1,\r\n    \"distance\": 50.0\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8001/api/storage_distances/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8001",
+							"path": [
+								"api",
+								"storage_distances",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetStorageDistance",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8001/api/storage_distances/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8001",
+							"path": [
+								"api",
+								"storage_distances",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

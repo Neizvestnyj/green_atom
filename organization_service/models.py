@@ -37,12 +37,19 @@ class StorageCopy(Base):
 
     :param id: Уникальный идентификатор копии хранилища
     :param capacity: Структура данных, описывающая ёмкость хранилища
+    :param storage_distances: Связь с таблицей расстояний
     """
 
     __tablename__ = "storage_copies"
 
     id = Column(Integer, primary_key=True, index=True)
     capacity = Column(JSON, nullable=False)  # Копия данных из сервиса Хранилище
+
+    storage_distances = relationship("StorageDistanceCopy",
+                                     back_populates="storage",
+                                     cascade="all, delete-orphan",
+                                     single_parent=True,
+                                     )
 
 
 class StorageDistanceCopy(Base):

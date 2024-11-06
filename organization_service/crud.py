@@ -1,7 +1,10 @@
+from typing import Sequence
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from models import Organisation, StorageCopy, StorageDistanceCopy
+from organization_service.models import Organisation
 from schemas import OrganisationCreate
 
 
@@ -22,7 +25,7 @@ async def create_organisation(db: AsyncSession, org: OrganisationCreate) -> Orga
     return db_org
 
 
-async def get_all_organisations(db: AsyncSession) -> list[Organisation]:
+async def get_all_organisations(db: AsyncSession) -> Sequence[Organisation]:
     """
     Получение всех организаций из базы данных.
 
@@ -32,7 +35,7 @@ async def get_all_organisations(db: AsyncSession) -> list[Organisation]:
 
     result = await db.execute(select(Organisation))
 
-    return list(result.scalars().all())
+    return result.scalars().all()
 
 
 async def create_storage_copy(db: AsyncSession, storage_id: int, capacity: dict) -> StorageCopy:

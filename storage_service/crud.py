@@ -1,9 +1,11 @@
+from typing import Sequence
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 import models
 import schemas
-from storage_service.models import OrganisationCopy
+from storage_service.models import OrganisationCopy, Storage, StorageDistance
 
 
 async def create_storage(db: AsyncSession, storage: schemas.StorageCreate) -> models.Storage:
@@ -84,7 +86,7 @@ async def delete_organisation_by_id(db: AsyncSession, organisation_id: int) -> N
         await db.commit()
 
 
-async def get_all_storages(db: AsyncSession) -> list[models.Storage]:
+async def get_all_storages(db: AsyncSession) -> Sequence[Storage]:
     """
     Получение всех хранилищ.
 
@@ -96,10 +98,10 @@ async def get_all_storages(db: AsyncSession) -> list[models.Storage]:
 
     result = await db.execute(select(models.Storage))
 
-    return list(result.scalars().all())
+    return result.scalars().all()
 
 
-async def get_all_storage_distances(db: AsyncSession) -> list[models.StorageDistance]:
+async def get_all_storage_distances(db: AsyncSession) -> Sequence[StorageDistance]:
     """
     Получение всех записей о расстояниях между хранилищами и организациями.
 
@@ -111,4 +113,4 @@ async def get_all_storage_distances(db: AsyncSession) -> list[models.StorageDist
 
     result = await db.execute(select(models.StorageDistance))
 
-    return list(result.scalars().all())
+    return result.scalars().all()

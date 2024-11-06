@@ -24,5 +24,5 @@ def clear_all_tables(db_path):
 
 
 # Пример использования
-clear_all_tables('organization_service/organisation_service.db')
-clear_all_tables('storage_service/storage_service.db')
+clear_all_tables('../organization_service/organisation_service.db')
+clear_all_tables('../storage_service/storage_service.db')
