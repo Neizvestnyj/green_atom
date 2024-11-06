@@ -12,6 +12,13 @@ class Organisation(Base):
     name = Column(String, unique=True, index=True)
     capacity = Column(JSON, nullable=False)  # Стекло, пластик и т.д.
 
+    storage_distances_copy = relationship(
+        "StorageDistanceCopy",
+        back_populates="organisation",  # Имя переменной на стороне StorageDistanceCopy
+        cascade="all, delete-orphan",
+        single_parent=True,
+    )
+
 
 class StorageCopy(Base):
     __tablename__ = "storage_copies"

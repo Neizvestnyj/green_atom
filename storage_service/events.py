@@ -4,7 +4,7 @@ from threading import Thread
 
 import pika
 
-from crud import create_organisation_copy
+from crud import create_organisation_copy, delete_organisation_by_id
 from database import AsyncSessionLocal
 from schemas import Storage
 
@@ -56,6 +56,28 @@ def listen_organisation_created_event():
     channel.start_consuming()
 
 
+def listen_organisations_deleted_event():
+    """Слушатель события удаления организации."""
+    connection = pika.BlockingConnection(pika.ConnectionParameters("localhost"))
+    channel = connection.channel()
+    channel.queue_declare(queue="organisations_delete")  # Создаем очередь для удаления организации
+
+    def callback(ch, method, properties, body):
+        message = json.loads(body)  # Словарь id-шников
+        organisation_ids = message["id"]
+
+        async def handle_event():
+            async with AsyncSessionLocal() as db:
+                for org_id in organisation_ids:
+                    await delete_organisation_by_id(db, org_id)
+
+        asyncio.run(handle_event())
+
+    channel.basic_consume(queue="organisations_delete", on_message_callback=callback, auto_ack=True)
+    channel.start_consuming()
+
+
 def start_listening_events():
     """Запуск прослушивания событий в отдельных потоках."""
     Thread(target=listen_organisation_created_event, daemon=True).start()
+    Thread(target=listen_organisations_deleted_event, daemon=True).start()

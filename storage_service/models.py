@@ -18,6 +18,9 @@ class OrganisationCopy(Base):
     __tablename__ = "organisation_copies"
 
     id = Column(Integer, primary_key=True, index=True)
+    storage_distances = relationship("StorageDistance", back_populates="organisation", cascade="all, delete-orphan",
+                                     single_parent=True,
+                                     )
 
 
 class StorageDistance(Base):

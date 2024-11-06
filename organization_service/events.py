@@ -1,3 +1,4 @@
+import asyncio
 import json
 from threading import Thread
 
@@ -19,6 +20,30 @@ def send_organisation_created_event(organisation: Organisation):
     connection.close()
 
 
+def send_organisations_delete_event(organisations: list[Organisation]):
+    # Создание подключения к RabbitMQ
+    connection = pika.BlockingConnection(pika.ConnectionParameters("localhost"))
+    channel = connection.channel()
+
+    # Обеспечиваем наличие очереди
+    channel.queue_declare(queue="organisations_delete")
+
+    # Подготовка сообщения с данными удалённых организаций
+    organisations_data = {"id": [org.id for org in organisations]}
+    message = json.dumps(organisations_data)
+
+    # Отправка сообщения
+    channel.basic_publish(
+        exchange="",
+        routing_key="organisations_delete",
+        body=message,
+    )
+    print(f" [x] Sent 'Organisations Deleted' event with {len(organisations)} organisations with message {message}")
+
+    # Закрытие подключения
+    connection.close()
+
+
 def listen_storage_created_event():
     connection = pika.BlockingConnection(pika.ConnectionParameters("localhost"))
     channel = connection.channel()
@@ -33,7 +58,7 @@ def listen_storage_created_event():
             async with AsyncSessionLocal() as db:  # Создаем копию хранилища
                 await create_storage_copy(db, storage_id=storage_id, capacity=capacity)
 
-        handle_event()
+        asyncio.run(handle_event())
 
     channel.basic_consume(queue="storage_created", on_message_callback=callback, auto_ack=True)
     channel.start_consuming()
@@ -60,7 +85,7 @@ def listen_storage_distance_created_event():
                                                    distance=distance,
                                                    )
 
-        handle_event()
+        asyncio.run(handle_event())
 
     channel.basic_consume(queue="storage_distance_created", on_message_callback=callback, auto_ack=True)
     channel.start_consuming()
@@ -68,8 +93,5 @@ def listen_storage_distance_created_event():
 
 def start_listening_events():
     """Запуск прослушивания событий в отдельных потоках."""
-
-    def start_listening_events():
-        """Запуск прослушивания событий в отдельных потоках."""
-        Thread(target=listen_storage_created_event, daemon=True).start()
-        Thread(target=listen_storage_distance_created_event, daemon=True).start()
+    Thread(target=listen_storage_created_event, daemon=True).start()
+    Thread(target=listen_storage_distance_created_event, daemon=True).start()

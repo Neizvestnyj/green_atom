@@ -39,3 +39,19 @@ async def create_storage_distance_copy(db: AsyncSession, storage_distance_id: in
     await db.commit()
     await db.refresh(db_storage_distance_copy)
     return db_storage_distance_copy
+
+
+async def delete_all_organisations(db: AsyncSession):
+    # Получаем все организации
+    result = await db.execute(select(Organisation))
+    organisations = result.scalars().all()
+
+    if not organisations:
+        return []
+
+    # Удаляем все организации
+    for organisation in organisations:
+        await db.delete(organisation)
+    await db.commit()
+
+    return organisations
