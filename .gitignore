@@ -91,3 +91,5 @@ openapi.json
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+
+*.db
