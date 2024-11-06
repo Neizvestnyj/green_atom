@@ -9,7 +9,17 @@ from database import AsyncSessionLocal
 from schemas import Organisation
 
 
-def send_organisation_created_event(organisation: Organisation):
+def send_organisation_created_event(organisation: Organisation) -> None:
+    """
+    Отправка события о создании организации в очередь RabbitMQ.
+
+    :param organisation: объект организации, данные которой отправляются в очередь
+    :return: None
+
+    Функция отправляет сообщение с ID организации в очередь `organisation_created`
+    для дальнейшей обработки другими сервисами или компонентами системы.
+    """
+
     connection = pika.BlockingConnection(pika.ConnectionParameters("localhost"))
     channel = connection.channel()
 
@@ -20,42 +30,68 @@ def send_organisation_created_event(organisation: Organisation):
     connection.close()
 
 
-def send_organisations_delete_event(organisations: list[Organisation]):
-    # Создание подключения к RabbitMQ
+def send_organisations_delete_event(organisations: list[Organisation]) -> None:
+    """
+    Отправка события об удалении организаций в очередь RabbitMQ.
+
+    :param organisations: список объектов организаций, данные которых отправляются в очередь
+    :return: None
+
+    Функция формирует и отправляет сообщение с ID удалённых организаций в очередь `organisations_delete`,
+    чтобы другие компоненты могли обработать это событие, например, для синхронизации данных.
+    """
+
     connection = pika.BlockingConnection(pika.ConnectionParameters("localhost"))
     channel = connection.channel()
 
-    # Обеспечиваем наличие очереди
     channel.queue_declare(queue="organisations_delete")
 
-    # Подготовка сообщения с данными удалённых организаций
     organisations_data = {"id": [org.id for org in organisations]}
     message = json.dumps(organisations_data)
 
-    # Отправка сообщения
     channel.basic_publish(
         exchange="",
         routing_key="organisations_delete",
         body=message,
     )
-    print(f" [x] Sent 'Organisations Deleted' event with {len(organisations)} organisations with message {message}")
 
-    # Закрытие подключения
     connection.close()
 
 
-def listen_storage_created_event():
+def listen_storage_created_event() -> None:
+    """
+    Прослушивание очереди `storage_created` для получения события о создании хранилища.
+
+    :return: None
+
+    Функция прослушивает очередь `storage_created` и, получив сообщение, извлекает данные о хранилище,
+    затем создает копию хранилища в базе данных с помощью функции `create_storage_copy`.
+    """
+
     connection = pika.BlockingConnection(pika.ConnectionParameters("localhost"))
     channel = connection.channel()
     channel.queue_declare(queue="storage_created")
 
     def callback(ch, method, properties, body):
+        """
+        Обработчик событий, который вызывает создание копии хранилища.
+
+        :param ch: канал связи с RabbitMQ
+        :param method: информация о доставке сообщения
+        :param properties: дополнительные свойства сообщения
+        :param body: данные события в виде байт
+        :return: None
+
+        Функция извлекает данные из события, а затем инициирует асинхронную обработку.
+        """
+
         message = json.loads(body)
         storage_id = message["id"]
         capacity = message["capacity"]
 
         async def handle_event():
-            async with AsyncSessionLocal() as db:  # Создаем копию хранилища
+            async with AsyncSessionLocal() as db:
+                # Создаем копию хранилища
                 await create_storage_copy(db, storage_id=storage_id, capacity=capacity)
 
         asyncio.run(handle_event())
@@ -64,12 +100,33 @@ def listen_storage_created_event():
     channel.start_consuming()
 
 
-def listen_storage_distance_created_event():
+def listen_storage_distance_created_event() -> None:
+    """
+    Прослушивание очереди `storage_distance_created` для получения события о создании расстояния между хранилищем и организацией.
+
+    :return: None
+
+    Функция прослушивает очередь `storage_distance_created` и, получив сообщение, извлекает данные о расстоянии,
+    затем создает копию записи о расстоянии в базе данных с помощью функции `create_storage_distance_copy`.
+    """
+
     connection = pika.BlockingConnection(pika.ConnectionParameters("localhost"))
     channel = connection.channel()
     channel.queue_declare(queue="storage_distance_created")
 
     def callback(ch, method, properties, body):
+        """
+        Обработчик событий, который вызывает создание копии записи о расстоянии между хранилищем и организацией.
+
+        :param ch: канал связи с RabbitMQ
+        :param method: информация о доставке сообщения
+        :param properties: дополнительные свойства сообщения
+        :param body: данные события в виде байт
+        :return: None
+
+        Функция извлекает данные из события и инициирует асинхронную обработку.
+        """
+
         message = json.loads(body)
         storage_distance_id = message["id"]
         storage_id = message["storage_id"]
@@ -77,7 +134,8 @@ def listen_storage_distance_created_event():
         distance = message["distance"]
 
         async def handle_event():
-            async with AsyncSessionLocal() as db:  # Создаем копию расстояния
+            async with AsyncSessionLocal() as db:
+                # Создаем копию записи о расстоянии
                 await create_storage_distance_copy(db,
                                                    storage_distance_id=storage_distance_id,
                                                    storage_id=storage_id,
@@ -91,7 +149,15 @@ def listen_storage_distance_created_event():
     channel.start_consuming()
 
 
-def start_listening_events():
-    """Запуск прослушивания событий в отдельных потоках."""
+def start_listening_events() -> None:
+    """
+    Запуск прослушивания событий в отдельных потоках.
+
+    :return: None
+
+    Функция запускает прослушивание двух событий: о создании хранилища и о создании расстояния.
+    Для каждого события используется отдельный поток, что позволяет асинхронно обрабатывать события.
+    """
+
     Thread(target=listen_storage_created_event, daemon=True).start()
     Thread(target=listen_storage_distance_created_event, daemon=True).start()
