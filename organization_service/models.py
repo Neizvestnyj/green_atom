@@ -1,33 +1,32 @@
-"""
-Сервис Организаций
-"""
+from sqlalchemy import Column, Integer, String, ForeignKey, JSON, Float
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 
-from pydantic import BaseModel
-from typing import Dict
-from enum import Enum
+Base = declarative_base()
 
 
-# Модель типа отхода
-class WasteType(str, Enum):
-    bio = "биоотходы"  # Bio waste
-    glass = "стекло"  # Glass
-    plastic = "пластик"  # Plastic
+class Organisation(Base):
+    __tablename__ = "organisations"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True, index=True)
+    capacity = Column(JSON, nullable=False)  # Стекло, пластик и т.д.
 
 
-class WasteUpdate(BaseModel):
-    waste_quantities: Dict[WasteType, int]
+class StorageCopy(Base):
+    __tablename__ = "storage_copies"
+
+    id = Column(Integer, primary_key=True, index=True)
+    capacity = Column(JSON, nullable=False)  # Копия данных из сервиса Хранилище
 
 
-class Organization(BaseModel):
-    id: int
-    name: str
-    waste_quantities: Dict[WasteType, int]  # Словарь с типами отходов и их количеством
+class StorageDistanceCopy(Base):
+    __tablename__ = "storage_distance_copies"
 
-    def add_waste(self, waste_type: str, amount: int):
-        if waste_type in self.waste_quantities:
-            self.waste_quantities[waste_type] += amount
-        else:
-            self.waste_quantities[waste_type] = amount
+    id = Column(Integer, primary_key=True, index=True)
+    storage_id = Column(Integer, ForeignKey("storage_copies.id"))
+    organisation_id = Column(Integer, ForeignKey("organisations.id"))
+    distance = Column(Float, nullable=False)
 
-    class Config:
-        arbitrary_types_allowed = True
+    storage = relationship("StorageCopy")
+    organisation = relationship("Organisation")

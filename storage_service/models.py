@@ -1,32 +1,32 @@
-from pydantic import BaseModel
-from typing import Dict
-from enum import Enum
+from sqlalchemy import Column, Integer, String, JSON, ForeignKey, Float
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
+
+Base = declarative_base()
 
 
-# Модель типа отхода
-class WasteType(str, Enum):
-    bio = "биоотходы"  # Bio waste
-    glass = "стекло"  # Glass
-    plastic = "пластик"  # Plastic
+class Storage(Base):
+    __tablename__ = "storages"
 
-class WasteTransferRequest(BaseModel):
-    organization_id: int
-    storage_id: int
-    waste_type: str
-    amount: int
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True, index=True)
+    location = Column(String, nullable=False)
+    capacity = Column(JSON, nullable=False)  # Стекло, пластик и т.д.
 
 
-class Storage(BaseModel):
-    id: int
-    location: str
-    max_capacity: Dict[WasteType, int]
-    current_storage: Dict[WasteType, int]
+class OrganisationCopy(Base):
+    __tablename__ = "organisation_copies"
 
-    def can_accept(self, waste_type: WasteType, amount: int) -> bool:
-        return (self.current_storage[waste_type] + amount) <= self.max_capacity[waste_type]
+    id = Column(Integer, primary_key=True, index=True)
 
-    def add_waste(self, waste_type: WasteType, amount: int):
-        if self.can_accept(waste_type, amount):
-            self.current_storage[waste_type] += amount
-        else:
-            raise ValueError("Максимальный запас в хранилище превышен")
+
+class StorageDistance(Base):
+    __tablename__ = "storage_distances"
+
+    id = Column(Integer, primary_key=True, index=True)
+    storage_id = Column(Integer, ForeignKey("storages.id"))
+    organisation_id = Column(Integer, ForeignKey("organisation_copies.id"))
+    distance = Column(Float, nullable=False)
+
+    storage = relationship("Storage")
+    organisation = relationship("OrganisationCopy")

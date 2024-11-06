@@ -1,70 +1,51 @@
-import json
-import os
-from fastapi import FastAPI, HTTPException
-from models import Storage, WasteTransferRequest
-import os
-import pika
-from fastapi import FastAPI
-from typing import List, Dict, Any
+from fastapi import FastAPI, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+
+import crud
+import database
+import schemas
+from database import AsyncSessionLocal
+from events import send_storage_created_event, send_storage_distance_created_event, start_listening_events
 
 app = FastAPI()
 
-# RabbitMQ connection parameters
-rabbitmq_host = os.getenv('RABBITMQ_HOST', 'localhost')
-connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbitmq_host))
-channel = connection.channel()
 
-# Declare a queue for waste transfer
-channel.queue_declare(queue='waste_transfer')
-
-# In-memory storage for demonstration
-storages = []
+@app.on_event("startup")
+async def startup():
+    await database.init_db()
+    start_listening_events()  # Запуск слушателей событий в отдельных потоках
 
 
-@app.post("/storages/", response_model=Storage)
-def create_storage(storage: Storage):
-    storages.append(storage)
-    return storage
+async def get_db():
+    async with AsyncSessionLocal() as session:
+        yield session
 
 
-@app.post("/transfer/")
-def transfer_waste(request: WasteTransferRequest):
-    storage = next((sto for sto in storages if sto.id == request.storage_id), None)
-
-    if storage:
-        try:
-            storage.add_waste(request.waste_type, request.amount)
-
-            # Publish a message to RabbitMQ
-            message = {
-                "organization_id": request.organization_id,
-                "storage_id": storage.id,
-                "waste_type": request.waste_type,
-                "amount": request.amount
-            }
-            channel.basic_publish(exchange='', routing_key='waste_transfer', body=json.dumps(message))
-
-            return {"status": "success", "message": f"Отходы добавлены в хранилище {storage.location}"}
-        except ValueError as e:
-            return {"status": "error", "message": str(e)}
-    else:
-        return {"status": "error", "message": "Хранилище не найдено"}
+@app.post("/storages/", response_model=schemas.Storage)
+async def create_storage(storage: schemas.StorageCreate, db: AsyncSession = Depends(get_db)):
+    db_storage = await crud.create_storage(db, storage)
+    send_storage_created_event(db_storage)
+    return db_storage
 
 
-@app.get("/storages/", response_model=List[Storage])
-def get_storages():
-    if not storages:
-        raise HTTPException(status_code=404, detail="Нет хранилищ.")
+@app.post("/storage_distances/", response_model=schemas.StorageDistance)
+async def create_storage_distance(distance: schemas.StorageDistanceBase, db: AsyncSession = Depends(get_db)):
+    db_distance = await crud.create_storage_distance(db, distance)
+    send_storage_distance_created_event(db_distance)
+    return db_distance
 
-    return storages
 
-@app.on_event("shutdown")
-def shutdown_event():
-    # Close the RabbitMQ connection
-    connection.close()
+@app.get("/storages/", response_model=list[schemas.Storage])
+async def get_storages(db: AsyncSession = Depends(get_db)):
+    return await crud.get_all_storages(db)
+
+
+@app.get("/storage_distances/", response_model=list[schemas.StorageDistance])
+async def get_storage_distances(db: AsyncSession = Depends(get_db)):
+    return await crud.get_all_storage_distances(db)
 
 
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="localhost", port=5001, log_level="debug")
+    uvicorn.run('main:app', host="127.0.0.1", port=8001, reload=True)
