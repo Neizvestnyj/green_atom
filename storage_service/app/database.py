@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from models import Base
 
 # URL для подключения к базе данных SQLite
-SQLALCHEMY_DATABASE_URL = "sqlite+aiosqlite:///./storage_service.db"
+SQLALCHEMY_DATABASE_URL = "sqlite+aiosqlite:///../storage_service.db"
 
 # Создание асинхронного двигателя базы данных
 engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True)
