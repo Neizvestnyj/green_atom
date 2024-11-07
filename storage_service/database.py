@@ -31,6 +31,19 @@ async def init_db() -> None:
         await conn.run_sync(Base.metadata.create_all)
 
 
+async def get_db() -> AsyncSession:
+    """
+    Функция для получения сессии базы данных.
+
+    :return: AsyncSession
+
+    Открывает сессию базы данных и предоставляет её для дальнейших операций.
+    """
+
+    async with AsyncSessionLocal() as session:
+        yield session
+
+
 # Включение поддержки внешних ключей для SQLite
 @event.listens_for(Engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record) -> None:

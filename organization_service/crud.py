@@ -3,8 +3,7 @@ from typing import Sequence
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from models import Organisation, StorageCopy, StorageDistanceCopy
-from organization_service.models import Organisation
+from models import StorageCopy, StorageDistanceCopy, Organisation
 from schemas import OrganisationCreate
 
 
@@ -57,11 +56,11 @@ async def create_storage_copy(db: AsyncSession, storage_id: int, capacity: dict)
 
 
 async def create_storage_distance_copy(
-    db: AsyncSession,
-    storage_distance_id: int,
-    storage_id: int,
-    organisation_id: int,
-    distance: float
+        db: AsyncSession,
+        storage_distance_id: int,
+        storage_id: int,
+        organisation_id: int,
+        distance: int,
 ) -> StorageDistanceCopy:
     """
     Создание копии записи о расстоянии между хранилищем и организацией.
@@ -78,7 +77,7 @@ async def create_storage_distance_copy(
         id=storage_distance_id,
         storage_id=storage_id,
         organisation_id=organisation_id,
-        distance=distance
+        distance=distance,
     )
 
     db.add(db_storage_distance_copy)
@@ -88,7 +87,7 @@ async def create_storage_distance_copy(
     return db_storage_distance_copy
 
 
-async def delete_all_organisations(db: AsyncSession) -> list[Organisation]:
+async def delete_all_organisations(db: AsyncSession) -> Sequence[Organisation]:
     """
     Удаление всех организаций из базы данных.
 

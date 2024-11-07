@@ -8,8 +8,8 @@ windows https://stackoverflow.com/questions/61768347/rabbit-mq-error-unable-to-p
 `pip install -r requirements.txt`
 
 Запуск приложений:
-`cd organization_service; uvicorn main:app --host localhost --port 5000 --reload --log-level debug`
-`cd storage_service; uvicorn main:app --host localhost --port 5001 --reload --log-level debug`
+`cd organization_service; uvicorn main:app --host localhost --port 8000 --reload --log-level debug`
+`cd storage_service; uvicorn main:app --host localhost --port 8001 --reload --log-level debug`
 
 Смотрим, что появилась запись в очереди `rabbitmqctl list_queues`
 Список подписок: `rabbitmqctl list_bindings`

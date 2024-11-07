@@ -1,13 +1,14 @@
 import asyncio
 import json
 from threading import Thread
-from typing import List
 
 import pika
+from pika.channel import Channel
+from pika.spec import Basic, BasicProperties
 
 from crud import create_organisation_copy, delete_organisation_by_id
 from database import AsyncSessionLocal
-from schemas import Storage
+from schemas import Storage, StorageDistance
 
 
 def send_storage_created_event(storage: Storage) -> None:
@@ -28,7 +29,7 @@ def send_storage_created_event(storage: Storage) -> None:
     connection.close()
 
 
-def send_storage_distance_created_event(storage_distance) -> None:
+def send_storage_distance_created_event(storage_distance: StorageDistance) -> None:
     """
     Отправка события о создании нового расстояния между хранилищем и организацией.
 
@@ -44,7 +45,7 @@ def send_storage_distance_created_event(storage_distance) -> None:
         "id": storage_distance.id,
         "storage_id": storage_distance.storage_id,
         "organisation_id": storage_distance.organisation_id,
-        "distance": storage_distance.distance
+        "distance": storage_distance.distance,
     })
     channel.basic_publish(exchange="", routing_key="storage_distance_created", body=message)
 
@@ -97,7 +98,7 @@ def listen_organisations_deleted_event() -> None:
     channel = connection.channel()
     channel.queue_declare(queue="organisations_delete")
 
-    def callback(ch, method, properties, body):
+    def callback(ch: Channel, method: Basic.Deliver, properties: BasicProperties, body: bytes):
         """
         Обработчик сообщений из очереди, который удаляет организации по id.
 

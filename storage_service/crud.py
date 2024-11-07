@@ -5,7 +5,6 @@ from sqlalchemy.future import select
 
 import models
 import schemas
-from storage_service.models import OrganisationCopy, Storage, StorageDistance
 
 
 async def create_storage(db: AsyncSession, storage: schemas.StorageCreate) -> models.Storage:
@@ -78,7 +77,7 @@ async def delete_organisation_by_id(db: AsyncSession, organisation_id: int) -> N
     Удаляет организацию и её связанные записи с помощью каскадного удаления.
     """
 
-    result = await db.execute(select(OrganisationCopy).filter(OrganisationCopy.id == organisation_id))
+    result = await db.execute(select(models.OrganisationCopy).filter(models.OrganisationCopy.id == organisation_id))
     organisation = result.scalars().first()
 
     if organisation:
@@ -86,7 +85,7 @@ async def delete_organisation_by_id(db: AsyncSession, organisation_id: int) -> N
         await db.commit()
 
 
-async def get_all_storages(db: AsyncSession) -> Sequence[Storage]:
+async def get_all_storages(db: AsyncSession) -> Sequence[models.Storage]:
     """
     Получение всех хранилищ.
 
@@ -101,7 +100,7 @@ async def get_all_storages(db: AsyncSession) -> Sequence[Storage]:
     return result.scalars().all()
 
 
-async def get_all_storage_distances(db: AsyncSession) -> Sequence[StorageDistance]:
+async def get_all_storage_distances(db: AsyncSession) -> Sequence[models.StorageDistance]:
     """
     Получение всех записей о расстояниях между хранилищами и организациями.
 

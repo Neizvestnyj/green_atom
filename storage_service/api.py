@@ -1,30 +1,21 @@
+from typing import Sequence
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import crud
+import models
 import schemas
-from database import AsyncSessionLocal
+from database import get_db
 from events import send_storage_created_event, send_storage_distance_created_event
 
 router = APIRouter()
 
 
-async def get_db() -> AsyncSession:
-    """
-    Функция для получения сессии базы данных.
-
-    :return: AsyncSession
-
-    Открывает сессию базы данных и предоставляет её для дальнейших операций.
-    """
-
-    async with AsyncSessionLocal() as session:
-        yield session
-
-
 @router.post("/storages/", response_model=schemas.Storage)
 async def create_storage(
-    storage: schemas.StorageCreate, db: AsyncSession = Depends(get_db)
+        storage: schemas.StorageCreate,
+        db: AsyncSession = Depends(get_db),
 ) -> schemas.Storage:
     """
     Создание нового хранилища.
@@ -44,7 +35,8 @@ async def create_storage(
 
 @router.post("/storage_distances/", response_model=schemas.StorageDistance)
 async def create_storage_distance(
-    distance: schemas.StorageDistanceBase, db: AsyncSession = Depends(get_db)
+        distance: schemas.StorageDistanceBase,
+        db: AsyncSession = Depends(get_db),
 ) -> schemas.StorageDistance:
     """
     Создание записи о расстоянии между хранилищем и организацией.
@@ -63,7 +55,7 @@ async def create_storage_distance(
 
 
 @router.get("/storages/", response_model=list[schemas.Storage])
-async def get_storages(db: AsyncSession = Depends(get_db)) -> list[schemas.Storage]:
+async def get_storages(db: AsyncSession = Depends(get_db)) -> Sequence[models.Storage]:
     """
     Получение списка всех хранилищ.
 
@@ -78,8 +70,8 @@ async def get_storages(db: AsyncSession = Depends(get_db)) -> list[schemas.Stora
 
 @router.get("/storage_distances/", response_model=list[schemas.StorageDistance])
 async def get_storage_distances(
-    db: AsyncSession = Depends(get_db)
-) -> list[schemas.StorageDistance]:
+        db: AsyncSession = Depends(get_db),
+) -> Sequence[models.StorageDistance]:
     """
     Получение списка всех записей о расстояниях между хранилищами и организациями.
 

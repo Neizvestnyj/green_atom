@@ -1,30 +1,22 @@
+from typing import Sequence
+
 from fastapi import APIRouter, Depends
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import crud
+import models
 import schemas
-from database import AsyncSessionLocal
+from database import get_db
 from events import send_organisation_created_event, send_organisations_delete_event
 
 router = APIRouter()
 
 
-async def get_db() -> AsyncSession:
-    """
-    Получение сессии базы данных.
-
-    :return: асинхронная сессия базы данных
-    """
-
-    async with AsyncSessionLocal() as session:
-        yield session
-
-
 @router.post("/organisations/", response_model=schemas.Organisation)
 async def create_organisation(
-    org: schemas.OrganisationCreate,
-    db: AsyncSession = Depends(get_db)
+        org: schemas.OrganisationCreate,
+        db: AsyncSession = Depends(get_db),
 ) -> schemas.Organisation:
     """
     Создание новой организации.
@@ -41,7 +33,7 @@ async def create_organisation(
 
 
 @router.get("/organisations/", response_model=list[schemas.Organisation])
-async def get_organisations(db: AsyncSession = Depends(get_db)) -> list[schemas.Organisation]:
+async def get_organisations(db: AsyncSession = Depends(get_db)) -> Sequence[models.Organisation]:
     """
     Получение списка всех организаций.
 
@@ -53,7 +45,7 @@ async def get_organisations(db: AsyncSession = Depends(get_db)) -> list[schemas.
 
 
 @router.delete("/organisations/", response_model=list[schemas.Organisation])
-async def delete_all_organisations(db: AsyncSession = Depends(get_db)) -> list[schemas.Organisation]:
+async def delete_all_organisations(db: AsyncSession = Depends(get_db)) -> Sequence[models.Organisation]:
     """
     Удаление всех организаций.
 
@@ -67,4 +59,5 @@ async def delete_all_organisations(db: AsyncSession = Depends(get_db)) -> list[s
         raise HTTPException(status_code=404, detail="No organisations found to delete")
 
     send_organisations_delete_event(organisations)
+
     return organisations

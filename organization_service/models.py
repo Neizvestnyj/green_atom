@@ -20,7 +20,7 @@ class Organisation(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, index=True)
-    capacity = Column(JSON, nullable=False)  # Стекло, пластик и т.д.
+    capacity = Column(JSON, nullable=False)  # Стекло, пластик, биоотходы
 
     # Связь с таблицей копий расстояний
     storage_distances_copy = relationship(
@@ -37,19 +37,19 @@ class StorageCopy(Base):
 
     :param id: Уникальный идентификатор копии хранилища
     :param capacity: Структура данных, описывающая ёмкость хранилища
-    :param storage_distances: Связь с таблицей расстояний
+    :param storage_distances_copy: Связь с таблицей расстояний
     """
 
-    __tablename__ = "storage_copies"
+    __tablename__ = "storages_copy"
 
     id = Column(Integer, primary_key=True, index=True)
     capacity = Column(JSON, nullable=False)  # Копия данных из сервиса Хранилище
 
-    storage_distances = relationship("StorageDistanceCopy",
-                                     back_populates="storage",
-                                     cascade="all, delete-orphan",
-                                     single_parent=True,
-                                     )
+    storage_distances_copy = relationship("StorageDistanceCopy",
+                                          back_populates="storage",
+                                          cascade="all, delete-orphan",
+                                          single_parent=True,
+                                          )
 
 
 class StorageDistanceCopy(Base):
@@ -64,15 +64,13 @@ class StorageDistanceCopy(Base):
     :param organisation: Связь с таблицей организаций
     """
 
-    __tablename__ = "storage_distance_copies"
+    __tablename__ = "storage_distances_copy"
 
     id = Column(Integer, primary_key=True, index=True)
-    storage_id = Column(Integer, ForeignKey("storage_copies.id"))
+    storage_id = Column(Integer, ForeignKey("storages_copy.id"))
     organisation_id = Column(Integer, ForeignKey("organisations.id"))
     distance = Column(Float, nullable=False)
 
-    # Связь с таблицей копий хранилищ
-    storage = relationship("StorageCopy")
-
-    # Связь с таблицей организаций
-    organisation = relationship("Organisation")
+    # Связь с таблицей копий хранилищ и организаций
+    storage = relationship("StorageCopy", back_populates="storage_distances_copy")
+    organisation = relationship("Organisation", back_populates="storage_distances_copy")

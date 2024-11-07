@@ -1,4 +1,5 @@
 from typing import Dict
+
 from pydantic import BaseModel
 
 
@@ -85,7 +86,7 @@ class StorageDistanceCopy(StorageDistanceCopyBase):
     :param distance: Расстояние между хранилищем и организацией
     """
 
-    id: int  # Уникальный идентификатор записи о расстоянии
+    id: int
 
     class Config:
-        from_attributes = True  # Включает возможность создания модели из атрибутов объекта
+        from_attributes = True

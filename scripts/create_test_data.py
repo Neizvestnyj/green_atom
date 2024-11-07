@@ -1,4 +1,5 @@
 import asyncio
+
 import httpx
 
 ORGANISATION_URL = "http://localhost:8000/api"  # URL вашего API

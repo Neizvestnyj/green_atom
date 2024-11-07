@@ -39,7 +39,7 @@ class OrganisationCopy(Base):
     :param storage_distances: Связь с таблицей расстояний (между хранилищем и организацией).
     """
 
-    __tablename__ = "organisation_copies"
+    __tablename__ = "organisations_copy"
 
     id = Column(Integer, primary_key=True, index=True)
     storage_distances = relationship("StorageDistance",
@@ -55,7 +55,7 @@ class StorageDistance(Base):
 
     :param id: Уникальный идентификатор записи о расстоянии.
     :param storage_id: Идентификатор хранилища (ссылается на `storages.id`).
-    :param organisation_id: Идентификатор копии организации (ссылается на `organisation_copies.id`).
+    :param organisation_id: Идентификатор копии организации (ссылается на `organisations_copy.id`).
     :param distance: Расстояние между хранилищем и организацией (например, в километрах).
     :param storage: Связь с таблицей `Storage` (хранилище).
     :param organisation: Связь с таблицей `OrganisationCopy` (копия организации).
@@ -65,7 +65,7 @@ class StorageDistance(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     storage_id = Column(Integer, ForeignKey("storages.id"))
-    organisation_id = Column(Integer, ForeignKey("organisation_copies.id"))
+    organisation_id = Column(Integer, ForeignKey("organisations_copy.id"))
     distance = Column(Float, nullable=False)
 
     # Определение связей с другими таблицами

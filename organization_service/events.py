@@ -1,8 +1,11 @@
 import asyncio
 import json
 from threading import Thread
+from typing import Sequence
 
 import pika
+from pika.channel import Channel
+from pika.spec import Basic, BasicProperties
 
 from crud import create_storage_copy, create_storage_distance_copy
 from database import AsyncSessionLocal
@@ -30,7 +33,7 @@ def send_organisation_created_event(organisation: Organisation) -> None:
     connection.close()
 
 
-def send_organisations_delete_event(organisations: list[Organisation]) -> None:
+def send_organisations_delete_event(organisations: Sequence[Organisation]) -> None:
     """
     Отправка события об удалении организаций в очередь RabbitMQ.
 
@@ -38,7 +41,7 @@ def send_organisations_delete_event(organisations: list[Organisation]) -> None:
     :return: None
 
     Функция формирует и отправляет сообщение с ID удалённых организаций в очередь `organisations_delete`,
-    чтобы другие компоненты могли обработать это событие, например, для синхронизации данных.
+    чтобы другие компоненты могли обработать это событие для синхронизации данных.
     """
 
     connection = pika.BlockingConnection(pika.ConnectionParameters("localhost"))
@@ -72,7 +75,7 @@ def listen_storage_created_event() -> None:
     channel = connection.channel()
     channel.queue_declare(queue="storage_created")
 
-    def callback(ch, method, properties, body):
+    def callback(ch: Channel, method: Basic.Deliver, properties: BasicProperties, body: bytes):
         """
         Обработчик событий, который вызывает создание копии хранилища.
 
@@ -114,7 +117,7 @@ def listen_storage_distance_created_event() -> None:
     channel = connection.channel()
     channel.queue_declare(queue="storage_distance_created")
 
-    def callback(ch, method, properties, body):
+    def callback(ch: Channel, method: Basic.Deliver, properties: BasicProperties, body: bytes):
         """
         Обработчик событий, который вызывает создание копии записи о расстоянии между хранилищем и организацией.
 
