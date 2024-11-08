@@ -2,8 +2,8 @@ import asyncio
 
 import httpx
 
-ORGANISATION_URL = "http://localhost:8000/api"  # URL вашего API
-STORAGE_URL = "http://localhost:8001/api"  # URL вашего API
+ORGANISATION_URL = "http://localhost:8000/api"
+STORAGE_URL = "http://localhost:8001/api"
 
 
 # Функция для создания организации с capacity

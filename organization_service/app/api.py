@@ -61,3 +61,25 @@ async def delete_all_organisations(db: AsyncSession = Depends(get_db)) -> Sequen
     send_organisations_delete_event(organisations)
 
     return organisations
+
+
+@router.post("/recycle", response_model=schemas.RecycleResponse)
+async def recycle(
+        recycle_request: schemas.RecycleRequest,
+        db: AsyncSession = Depends(get_db),
+):
+    """
+    Запрос на утилизацию отходов.
+
+    :param recycle_request: запрос, содержащий ID организации и список типов отходов.
+    :param db: асинхронная сессия базы данных.
+    :return: словарь с хранилищами и количеством отходов для отправки.
+    """
+
+    # Находим ближайшие доступные хранилища и определяем, куда можно поместить отходы
+    storage_plan = await crud.find_nearest_storage(db, recycle_request.organisation_id)
+
+    if not storage_plan:
+        raise HTTPException(status_code=404, detail="Нет доступных хранилищ для утилизации отходов")
+
+    return schemas.RecycleResponse(storage_plan=storage_plan)

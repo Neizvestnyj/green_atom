@@ -11,8 +11,8 @@ class OrganisationBase(BaseModel):
     :param capacity: Словарь, где ключ - это тип ресурса (например, стекло, пластик), а значение - список ёмкостей
     """
 
-    name: str  # Название организации
-    capacity: Dict[str, list]  # Словарь типов ресурсов и их ёмкостей
+    name: str
+    capacity: Dict[str, list]
 
 
 class OrganisationCreate(OrganisationBase):
@@ -32,7 +32,7 @@ class Organisation(OrganisationBase):
     :param capacity: Словарь типов ресурсов и их ёмкостей
     """
 
-    id: int  # Уникальный идентификатор организации
+    id: int
 
     class Config:
         from_attributes = True  # Включает возможность создания модели из атрибутов объекта
@@ -45,7 +45,7 @@ class StorageCopyBase(BaseModel):
     :param capacity: Словарь, где ключ - это тип ресурса, а значение - список ёмкостей хранилища
     """
 
-    capacity: Dict[str, list]  # Ёмкости хранилища по типам ресурсов
+    capacity: Dict[str, list]
 
 
 class StorageCopy(StorageCopyBase):
@@ -56,10 +56,10 @@ class StorageCopy(StorageCopyBase):
     :param capacity: Словарь типов ресурсов и их ёмкостей в хранилище
     """
 
-    id: int  # Уникальный идентификатор копии хранилища
+    id: int
 
     class Config:
-        from_attributes = True  # Включает возможность создания модели из атрибутов объекта
+        from_attributes = True
 
 
 class StorageDistanceCopyBase(BaseModel):
@@ -71,9 +71,9 @@ class StorageDistanceCopyBase(BaseModel):
     :param distance: Расстояние между хранилищем и организацией
     """
 
-    storage_id: int  # Идентификатор хранилища
-    organisation_id: int  # Идентификатор организации
-    distance: float  # Расстояние между хранилищем и организацией
+    storage_id: int
+    organisation_id: int
+    distance: float
 
 
 class StorageDistanceCopy(StorageDistanceCopyBase):
@@ -90,3 +90,25 @@ class StorageDistanceCopy(StorageDistanceCopyBase):
 
     class Config:
         from_attributes = True
+
+
+class RecycleRequest(BaseModel):
+    """
+    Модель запроса на утилизацию отходов.
+
+    :param organisation_id: Идентификатор организации, запрашивающей утилизацию
+    """
+
+    organisation_id: int
+
+
+class RecycleResponse(BaseModel):
+    """
+    Модель ответа на запрос утилизации, содержащая план утилизации по хранилищам.
+
+    :param storage_plan: Словарь, содержащий ID хранилища и объемы отходов, которые
+                         можно туда передать.
+                         Пример: {1: {"Стекло": 50, "Биоотходы": 100}, 2: {"Стекло": 50}}
+    """
+
+    storage_plan: Dict[int, Dict[str, int]]
