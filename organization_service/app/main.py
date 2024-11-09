@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 
-import database
-from api import router as organisations_router
-from events import start_listening_events
+from organization_service.app.database import init_db
+from organization_service.app.api import router as organisations_router
+from organization_service.app.events.listen import start_listening_events
 
 app = FastAPI()
 app.include_router(organisations_router, prefix="/api", tags=["organisations"])
@@ -19,7 +19,7 @@ async def startup() -> None:
     используя `start_listening_events()`.
     """
 
-    await database.init_db()  # Инициализация базы данных
+    await init_db()  # Инициализация базы данных
     start_listening_events()  # Запуск прослушивания событий в отдельных потоках
 
 

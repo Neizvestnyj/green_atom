@@ -4,20 +4,25 @@ from fastapi import APIRouter, Depends
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-import crud
-import models
-import schemas
-from database import get_db
-from events import send_organisation_created_event, send_organisations_delete_event
+from organization_service.app.crud.organisation import (create_organisation as crud_create_organisation,
+                               get_all_organisations as crud_get_all_organisations,
+                               delete_all_organisations as crud_delete_all_organisations,
+                               )
+from .database import get_db
+from organization_service.app.events.send.organisation import send_organisation_created_event, send_organisations_delete_event
+from organization_service.app.models.organisation import Organisation
+from organization_service.app.schemas.organisation import OrganisationSchema, OrganisationCreateSchema
+from organization_service.app.schemas.recycle import RecycleRequestSchema, RecycleResponseSchema
+from organization_service.app.services.waste_distribution import find_nearest_storage
 
 router = APIRouter()
 
 
-@router.post("/organisations/", response_model=schemas.Organisation)
+@router.post("/organisations/", response_model=OrganisationSchema)
 async def create_organisation(
-        org: schemas.OrganisationCreate,
+        org: OrganisationCreateSchema,
         db: AsyncSession = Depends(get_db),
-) -> schemas.Organisation:
+) -> Organisation:
     """
     Создание новой организации.
 
@@ -26,14 +31,14 @@ async def create_organisation(
     :return: созданная организация
     """
 
-    organisation = await crud.create_organisation(db, org)
+    organisation = await crud_create_organisation(db, org)
     send_organisation_created_event(organisation)
 
     return organisation
 
 
-@router.get("/organisations/", response_model=list[schemas.Organisation])
-async def get_organisations(db: AsyncSession = Depends(get_db)) -> Sequence[models.Organisation]:
+@router.get("/organisations/", response_model=list[OrganisationSchema])
+async def get_organisations(db: AsyncSession = Depends(get_db)) -> Sequence[Organisation]:
     """
     Получение списка всех организаций.
 
@@ -41,11 +46,11 @@ async def get_organisations(db: AsyncSession = Depends(get_db)) -> Sequence[mode
     :return: список организаций
     """
 
-    return await crud.get_all_organisations(db)
+    return await crud_get_all_organisations(db)
 
 
-@router.delete("/organisations/", response_model=list[schemas.Organisation])
-async def delete_all_organisations(db: AsyncSession = Depends(get_db)) -> Sequence[models.Organisation]:
+@router.delete("/organisations/", response_model=list[OrganisationSchema])
+async def delete_all_organisations(db: AsyncSession = Depends(get_db)) -> Sequence[Organisation]:
     """
     Удаление всех организаций.
 
@@ -54,7 +59,7 @@ async def delete_all_organisations(db: AsyncSession = Depends(get_db)) -> Sequen
     :raises HTTPException: если организации для удаления не найдены
     """
 
-    organisations = await crud.delete_all_organisations(db)
+    organisations = await crud_delete_all_organisations(db)
     if not organisations:
         raise HTTPException(status_code=404, detail="No organisations found to delete")
 
@@ -63,9 +68,9 @@ async def delete_all_organisations(db: AsyncSession = Depends(get_db)) -> Sequen
     return organisations
 
 
-@router.post("/recycle", response_model=schemas.RecycleResponse)
+@router.post("/recycle", response_model=RecycleResponseSchema)
 async def recycle(
-        recycle_request: schemas.RecycleRequest,
+        recycle_request: RecycleRequestSchema,
         db: AsyncSession = Depends(get_db),
 ):
     """
@@ -77,9 +82,9 @@ async def recycle(
     """
 
     # Находим ближайшие доступные хранилища и определяем, куда можно поместить отходы
-    storage_plan = await crud.find_nearest_storage(db, recycle_request.organisation_id)
+    storage_plan = await find_nearest_storage(db, recycle_request.organisation_id)
 
     if not storage_plan:
         raise HTTPException(status_code=404, detail="Нет доступных хранилищ для утилизации отходов")
 
-    return schemas.RecycleResponse(storage_plan=storage_plan)
+    return RecycleResponseSchema(storage_plan=storage_plan)

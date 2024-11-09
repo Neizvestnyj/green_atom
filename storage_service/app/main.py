@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 
-import database
-from api import router as storage_router
-from events import start_listening_events
+from storage_service.app.database import init_db
+from storage_service.app.api import router as storage_router
+from storage_service.app.events.listen import start_listening_events
 
 app = FastAPI()
 app.include_router(storage_router, prefix="/api", tags=["storages"])
@@ -19,7 +19,7 @@ async def startup() -> None:
     используя `start_listening_events()` для асинхронной обработки событий в отдельных потоках.
     """
 
-    await database.init_db()  # Инициализация базы данных
+    await init_db()  # Инициализация базы данных
     start_listening_events()  # Запуск прослушивания событий в отдельных потоках
 
 

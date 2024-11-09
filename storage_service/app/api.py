@@ -3,20 +3,26 @@ from typing import Sequence
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-import crud
-import models
-import schemas
-from database import get_db
-from events import send_storage_created_event, send_storage_distance_created_event
+from storage_service.app.crud.storage import create_storage as crud_create_storage, \
+    get_all_storages as crud_get_all_storages
+from storage_service.app.crud.storage_distance import get_all_storage_distances as crud_get_all_storage_distances, \
+    create_storage_distance as crud_create_storage_distance
+from storage_service.app.events.send.storage import send_storage_created_event
+from storage_service.app.events.send.storage_distance import send_storage_distance_created_event
+from storage_service.app.models.storage import Storage
+from storage_service.app.models.storage_distance import StorageDistance
+from storage_service.app.schemas.storage import StorageSchema, StorageSchemaCreateSchema
+from storage_service.app.schemas.storage_distance import StorageDistanceSchema
+from .database import get_db
 
 router = APIRouter()
 
 
-@router.post("/storages/", response_model=schemas.Storage)
+@router.post("/storages/", response_model=StorageSchema)
 async def create_storage(
-        storage: schemas.StorageCreate,
+        storage: StorageSchemaCreateSchema,
         db: AsyncSession = Depends(get_db),
-) -> schemas.Storage:
+) -> Storage:
     """
     Создание нового хранилища.
 
@@ -27,17 +33,17 @@ async def create_storage(
     Создает новое хранилище в базе данных, вызывает событие `send_storage_created_event` и возвращает созданное хранилище.
     """
 
-    db_storage = await crud.create_storage(db, storage)
+    db_storage = await crud_create_storage(db, storage)
     send_storage_created_event(db_storage)
 
     return db_storage
 
 
-@router.post("/storage_distances/", response_model=schemas.StorageDistance)
+@router.post("/storage_distances/", response_model=StorageDistanceSchema)
 async def create_storage_distance(
-        distance: schemas.StorageDistanceBase,
+        distance: StorageDistanceSchema,
         db: AsyncSession = Depends(get_db),
-) -> schemas.StorageDistance:
+) -> StorageDistance:
     """
     Создание записи о расстоянии между хранилищем и организацией.
 
@@ -48,14 +54,14 @@ async def create_storage_distance(
     Создает новую запись о расстоянии, вызывает событие `send_storage_distance_created_event` и возвращает созданную запись.
     """
 
-    db_distance = await crud.create_storage_distance(db, distance)
+    db_distance = await crud_create_storage_distance(db, distance)
     send_storage_distance_created_event(db_distance)
 
     return db_distance
 
 
-@router.get("/storages/", response_model=list[schemas.Storage])
-async def get_storages(db: AsyncSession = Depends(get_db)) -> Sequence[models.Storage]:
+@router.get("/storages/", response_model=list[StorageSchema])
+async def get_storages(db: AsyncSession = Depends(get_db)) -> Sequence[Storage]:
     """
     Получение списка всех хранилищ.
 
@@ -65,13 +71,13 @@ async def get_storages(db: AsyncSession = Depends(get_db)) -> Sequence[models.St
     Возвращает все хранилища из базы данных.
     """
 
-    return await crud.get_all_storages(db)
+    return await crud_get_all_storages(db)
 
 
-@router.get("/storage_distances/", response_model=list[schemas.StorageDistance])
+@router.get("/storage_distances/", response_model=list[StorageDistanceSchema])
 async def get_storage_distances(
         db: AsyncSession = Depends(get_db),
-) -> Sequence[models.StorageDistance]:
+) -> Sequence[StorageDistance]:
     """
     Получение списка всех записей о расстояниях между хранилищами и организациями.
 
@@ -81,4 +87,4 @@ async def get_storage_distances(
     Возвращает все записи о расстояниях из базы данных.
     """
 
-    return await crud.get_all_storage_distances(db)
+    return await crud_get_all_storage_distances(db)

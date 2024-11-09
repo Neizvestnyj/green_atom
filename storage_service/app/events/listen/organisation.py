@@ -1,55 +1,12 @@
 import asyncio
 import json
-from threading import Thread
 
 import pika
 from pika.channel import Channel
 from pika.spec import Basic, BasicProperties
 
-from crud import create_organisation_copy, delete_organisation_by_id
-from database import AsyncSessionLocal
-from schemas import Storage, StorageDistance
-
-
-def send_storage_created_event(storage: Storage) -> None:
-    """
-    Отправка события о создании нового хранилища.
-
-    :param storage: Объект хранилища, для которого отправляется событие
-    :return: None
-    """
-
-    connection = pika.BlockingConnection(pika.ConnectionParameters("localhost"))
-    channel = connection.channel()
-
-    channel.queue_declare(queue="storage_created")
-    message = json.dumps({"id": storage.id, "capacity": storage.capacity})
-    channel.basic_publish(exchange="", routing_key="storage_created", body=message)
-
-    connection.close()
-
-
-def send_storage_distance_created_event(storage_distance: StorageDistance) -> None:
-    """
-    Отправка события о создании нового расстояния между хранилищем и организацией.
-
-    :param storage_distance: Объект расстояния между хранилищем и организацией
-    :return: None
-    """
-
-    connection = pika.BlockingConnection(pika.ConnectionParameters("localhost"))
-    channel = connection.channel()
-
-    channel.queue_declare(queue="storage_distance_created")
-    message = json.dumps({
-        "id": storage_distance.id,
-        "storage_id": storage_distance.storage_id,
-        "organisation_id": storage_distance.organisation_id,
-        "distance": storage_distance.distance,
-    })
-    channel.basic_publish(exchange="", routing_key="storage_distance_created", body=message)
-
-    connection.close()
+from storage_service.app.crud.organisation import create_organisation_copy, delete_organisation_by_id
+from storage_service.app.database import AsyncSessionLocal
 
 
 def listen_organisation_created_event() -> None:
@@ -63,7 +20,7 @@ def listen_organisation_created_event() -> None:
     channel = connection.channel()
     channel.queue_declare(queue="organisation_created")
 
-    def callback(ch, method, properties, body):
+    def callback(ch: Channel, method: Basic.Deliver, properties: BasicProperties, body: bytes):
         """
         Обработчик сообщений из очереди, который создает копию организации.
 
@@ -121,14 +78,3 @@ def listen_organisations_deleted_event() -> None:
 
     channel.basic_consume(queue="organisations_delete", on_message_callback=callback, auto_ack=True)
     channel.start_consuming()
-
-
-def start_listening_events() -> None:
-    """
-    Запускает прослушивание событий о создании и удалении организаций в отдельных потоках.
-
-    :return: None
-    """
-
-    Thread(target=listen_organisation_created_event, daemon=True).start()
-    Thread(target=listen_organisations_deleted_event, daemon=True).start()

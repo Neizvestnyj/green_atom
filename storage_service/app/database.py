@@ -3,7 +3,7 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from models import Base
+from storage_service.app.models import Base
 
 # URL для подключения к базе данных SQLite
 SQLALCHEMY_DATABASE_URL = "sqlite+aiosqlite:///../storage_service.db"
