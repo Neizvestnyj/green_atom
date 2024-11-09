@@ -39,8 +39,8 @@ jobs:
     
     - name: Run tests
       run: |
-        docker-compose exec organization_service curl http://localhost:8000
-        docker-compose exec organization_service curl http://localhost:8001
+        docker-compose exec -T organization_service curl http://organization_service:8000
+        docker-compose exec -T storage_service curl http://storage_service:8001
 
     - name: Shut down Docker Compose
       run: |
