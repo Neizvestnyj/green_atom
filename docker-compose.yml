@@ -1,31 +1,44 @@
-version: '3.8'
-
 services:
-  rabbitmq:
-    image: rabbitmq:3-management
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-
-  postgres:
-    image: postgres
-    environment:
-      POSTGRES_DB: waste_accounting
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-    ports:
-      - "5432:5432"
-
   organization_service:
-    build: ./organization_service
+    build:
+      context: ./organization_service
+    container_name: organization_service
     ports:
       - "8000:8000"
+    networks:
+      - app-network
     environment:
-      RABBITMQ_HOST: rabbitmq
+      - DATABASE_URL=sqlite+aiosqlite:///./organisation_service.db
+      - RABBITMQ_HOST=rabbitmq
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
 
   storage_service:
-    build: ./storage_service
+    build:
+      context: ./storage_service
+    container_name: storage_service
     ports:
       - "8001:8001"
+    networks:
+      - app-network
     environment:
-      RABBITMQ_HOST: rabbitmq
+      - DATABASE_URL=sqlite+aiosqlite:///./storage_service.db
+      - RABBITMQ_HOST=rabbitmq
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  rabbitmq:
+      image: "rabbitmq:3-management"
+      networks:
+        - app-network
+      healthcheck:
+        test: rabbitmq-diagnostics check_port_connectivity
+        interval: 30s
+        timeout: 30s
+        retries: 10
+
+networks:
+  app-network:
+    driver: bridge

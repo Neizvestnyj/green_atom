@@ -13,3 +13,9 @@ windows https://stackoverflow.com/questions/61768347/rabbit-mq-error-unable-to-p
 
 Смотрим, что появилась запись в очереди `rabbitmqctl list_queues`
 Список подписок: `rabbitmqctl list_bindings`
+
+# Деплой
+
+```shell
+docker-compose up --build
+```
