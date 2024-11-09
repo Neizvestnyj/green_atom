@@ -36,6 +36,10 @@ jobs:
     - name: Build and start services
       run: |
         docker-compose -f docker-compose.yml up -d --build
+
+    - name: Check containers
+      run: | 
+        docker-compose ps
     
     - name: Run tests
       run: |
