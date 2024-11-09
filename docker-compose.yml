@@ -30,14 +30,14 @@ services:
         condition: service_healthy
 
   rabbitmq:
-      image: "rabbitmq:3-management"
-      networks:
-        - app-network
-      healthcheck:
-        test: rabbitmq-diagnostics check_port_connectivity
-        interval: 30s
-        timeout: 30s
-        retries: 10
+    image: "rabbitmq:3-management"
+    networks:
+      - app-network
+    healthcheck:
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 30s
+      timeout: 30s
+      retries: 10
 
 networks:
   app-network:

@@ -2,8 +2,8 @@ import json
 
 import pika
 
-from storage_app.models.storage import Storage
 from storage_app.events import RABBITMQ_HOST
+from storage_app.models.storage import Storage
 
 
 def send_storage_created_event(storage: Storage) -> None:

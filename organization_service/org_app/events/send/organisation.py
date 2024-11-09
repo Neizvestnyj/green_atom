@@ -3,8 +3,8 @@ from typing import Sequence
 
 import pika
 
-from org_app.models.organisation import Organisation
 from org_app.events import RABBITMQ_HOST
+from org_app.models.organisation import Organisation
 
 
 def send_organisation_created_event(organisation: Organisation) -> None:

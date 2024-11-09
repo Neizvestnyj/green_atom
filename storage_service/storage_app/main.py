@@ -27,4 +27,4 @@ if __name__ == "__main__":
     import uvicorn
 
     # Запуск приложения через uvicorn на порту 8001
-    uvicorn.run('main:app', host="127.0.0.1", port=8001, reload=True, log_level='debug')
+    uvicorn.run('main:app', host="localhost", port=8001, reload=True, log_level='debug')
