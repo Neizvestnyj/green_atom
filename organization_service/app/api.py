@@ -5,15 +5,16 @@ from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from organization_service.app.crud.organisation import (create_organisation as crud_create_organisation,
-                               get_all_organisations as crud_get_all_organisations,
-                               delete_all_organisations as crud_delete_all_organisations,
-                               )
-from .database import get_db
-from organization_service.app.events.send.organisation import send_organisation_created_event, send_organisations_delete_event
+                                                        get_all_organisations as crud_get_all_organisations,
+                                                        delete_all_organisations as crud_delete_all_organisations,
+                                                        )
+from organization_service.app.events.send.organisation import send_organisation_created_event, \
+    send_organisations_delete_event
 from organization_service.app.models.organisation import Organisation
 from organization_service.app.schemas.organisation import OrganisationSchema, OrganisationCreateSchema
 from organization_service.app.schemas.recycle import RecycleRequestSchema, RecycleResponseSchema
 from organization_service.app.services.waste_distribution import find_nearest_storage
+from .database import get_db
 
 router = APIRouter()
 

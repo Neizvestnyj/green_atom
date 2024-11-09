@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
-from organization_service.app.database import init_db
 from organization_service.app.api import router as organisations_router
+from organization_service.app.database import init_db
 from organization_service.app.events.listen import start_listening_events
 
 app = FastAPI()

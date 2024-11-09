@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
-from storage_service.app.database import init_db
 from storage_service.app.api import router as storage_router
+from storage_service.app.database import init_db
 from storage_service.app.events.listen import start_listening_events
 
 app = FastAPI()

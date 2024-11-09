@@ -12,7 +12,7 @@ from storage_service.app.events.send.storage_distance import send_storage_distan
 from storage_service.app.models.storage import Storage
 from storage_service.app.models.storage_distance import StorageDistance
 from storage_service.app.schemas.storage import StorageSchema, StorageSchemaCreateSchema
-from storage_service.app.schemas.storage_distance import StorageDistanceSchema
+from storage_service.app.schemas.storage_distance import StorageDistanceSchema, StorageDistanceBaseSchema
 from .database import get_db
 
 router = APIRouter()
@@ -41,7 +41,7 @@ async def create_storage(
 
 @router.post("/storage_distances/", response_model=StorageDistanceSchema)
 async def create_storage_distance(
-        distance: StorageDistanceSchema,
+        distance: StorageDistanceBaseSchema,
         db: AsyncSession = Depends(get_db),
 ) -> StorageDistance:
     """
