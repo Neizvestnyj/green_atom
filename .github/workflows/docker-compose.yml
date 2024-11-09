@@ -43,8 +43,8 @@ jobs:
 
       - name: Run tests
         run: |
-          docker-compose exec -T organization_service curl --fail http://localhost:8000/api/health
-          docker-compose exec -T storage_service curl --fail http://localhost:8001/api/health
+          docker-compose exec -T organization_service curl --fail http://organization_service:8000/api/health
+          docker-compose exec -T storage_service curl --fail http://storage_service:8001/api/health
 
       - name: Shut down Docker Compose
         run: |
