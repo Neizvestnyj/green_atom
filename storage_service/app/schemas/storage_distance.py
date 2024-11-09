@@ -12,7 +12,7 @@ class StorageDistanceBaseSchema(BaseModel):
 
     storage_id: int
     organisation_id: int
-    distance: float
+    distance: int
 
 
 class StorageDistanceSchema(StorageDistanceBaseSchema):

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, ForeignKey, Float
+from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 
 from . import Base
@@ -21,7 +21,7 @@ class StorageDistanceCopy(Base):
     id = Column(Integer, primary_key=True, index=True)
     storage_id = Column(Integer, ForeignKey("storages_copy.id"))
     organisation_id = Column(Integer, ForeignKey("organisations.id"))
-    distance = Column(Float, nullable=False)
+    distance = Column(Integer, nullable=False)
 
     # Связь с таблицей копий хранилищ и организаций
     storage = relationship("StorageCopy", back_populates="storage_distances_copy")

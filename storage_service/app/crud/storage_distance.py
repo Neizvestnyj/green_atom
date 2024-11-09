@@ -4,10 +4,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from storage_service.app.models.storage_distance import StorageDistance
-from storage_service.app.schemas.storage_distance import StorageDistanceSchema
+from storage_service.app.schemas.storage_distance import StorageDistanceBaseSchema
 
 
-async def create_storage_distance(db: AsyncSession, distance: StorageDistanceSchema) -> StorageDistance:
+async def create_storage_distance(db: AsyncSession, distance: StorageDistanceBaseSchema) -> StorageDistance:
     """
     Создание новой записи о расстоянии между хранилищем и организацией.
 
