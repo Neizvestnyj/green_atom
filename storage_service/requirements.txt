@@ -4,3 +4,5 @@ pika
 pydantic
 aiosqlite
 sqlalchemy
+pytest
+httpx

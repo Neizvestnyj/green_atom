@@ -1,6 +1,6 @@
 from typing import Dict
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class StorageSchemaCopyBaseSchema(BaseModel):
@@ -19,9 +19,9 @@ class StorageSchemaCopySchema(StorageSchemaCopyBaseSchema):
 
     :param id: Уникальный идентификатор копии хранилища
     :param capacity: Словарь типов ресурсов и их ёмкостей в хранилище
+    :param model_config: Конфигурация модели для автоматического извлечения значений атрибутов из ORM-модели.
     """
 
     id: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

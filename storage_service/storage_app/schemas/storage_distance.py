@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class StorageDistanceBaseSchema(BaseModel):
@@ -19,17 +19,9 @@ class StorageDistanceSchema(StorageDistanceBaseSchema):
     """
     Модель для хранения информации о расстоянии между хранилищем и организацией с уникальным идентификатором.
 
-    :param id: Уникальный идентификатор записи о расстоянии.
+    :param model_config: Конфигурация модели для автоматического извлечения значений атрибутов из ORM-модели.
     """
 
     id: int
 
-    class Config:
-        """
-        Конфигурация модели Pydantic для StorageDistanceSchema.
-
-        :from_attributes: Указывает, что модель может быть автоматически
-        создана из атрибутов SQLAlchemy модели, например, при запросе
-        из базы данных.
-        """
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

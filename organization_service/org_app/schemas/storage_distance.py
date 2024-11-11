@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class StorageDistanceCopyBaseSchema(BaseModel):
@@ -23,9 +23,9 @@ class StorageDistanceCopySchema(StorageDistanceCopyBaseSchema):
     :param storage_id: Идентификатор хранилища
     :param organisation_id: Идентификатор организации
     :param distance: Расстояние между хранилищем и организацией
+    :param model_config: Конфигурация модели для автоматического извлечения значений атрибутов из ORM-модели.
     """
 
     id: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

@@ -1,6 +1,6 @@
 from typing import Dict
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class OrganisationBaseSchema(BaseModel):
@@ -30,9 +30,9 @@ class OrganisationSchema(OrganisationBaseSchema):
     :param id: Уникальный идентификатор организации
     :param name: Название организации
     :param capacity: Словарь типов ресурсов и их ёмкостей
+    :param model_config: Конфигурация модели для автоматического извлечения значений атрибутов из ORM-модели.
     """
 
     id: int
 
-    class Config:
-        from_attributes = True  # Включает возможность создания модели из атрибутов объекта
+    model_config = ConfigDict(from_attributes=True)  # Включает возможность создания модели из атрибутов объекта

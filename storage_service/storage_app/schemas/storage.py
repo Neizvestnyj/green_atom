@@ -1,6 +1,6 @@
 from typing import Dict
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class StorageSchemaBaseSchema(BaseModel):
@@ -34,17 +34,9 @@ class StorageSchema(StorageSchemaBaseSchema):
     Модель для хранения информации о хранилище с его уникальным идентификатором.
 
     :param id: Уникальный идентификатор хранилища в базе данных.
+    :param model_config: Конфигурация модели для автоматического извлечения значений атрибутов из ORM-модели.
     """
 
     id: int
 
-    class Config:
-        """
-        Конфигурация модели Pydantic.
-
-        :from_attributes: Указывает, что модель может быть автоматически
-        создана из атрибутов SQLAlchemy модели, например, при запросе
-        из базы данных.
-        """
-
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

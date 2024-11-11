@@ -1,27 +1,33 @@
+from contextlib import asynccontextmanager
+from typing import AsyncGenerator
+
 from fastapi import FastAPI
 
-from storage_app.api import router as storage_router
-from storage_app.database import init_db
-from storage_app.events.listen import start_listening_events
-
-app = FastAPI()
-app.include_router(storage_router, prefix="/api", tags=["storages"])
+from org_app.api import router as storage_router
+from org_app.database import init_db
+from org_app.events.listen import start_listening_events
 
 
-@app.on_event("startup")
-async def startup() -> None:
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """
-    Функция, которая выполняется при старте приложения.
+    Функция, которая выполняется при старте приложения и завершении.
 
     :return: None
 
     Инициализирует базу данных с помощью функции `init_db()` и запускает прослушивание событий,
-    используя `start_listening_events()` для асинхронной обработки событий в отдельных потоках.
+    используя `start_listening_events()`.
     """
 
+    # код инициализации
     await init_db()  # Инициализация базы данных
     start_listening_events()  # Запуск прослушивания событий в отдельных потоках
+    yield
+    # код завершения работы
 
+
+app = FastAPI(lifespan=lifespan)
+app.include_router(storage_router, prefix="/api", tags=["storages"])
 
 if __name__ == "__main__":
     import uvicorn
