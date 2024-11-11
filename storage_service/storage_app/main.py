@@ -3,9 +3,9 @@ from typing import AsyncGenerator
 
 from fastapi import FastAPI
 
-from org_app.api import router as storage_router
-from org_app.database import init_db
-from org_app.events.listen import start_listening_events
+from storage_app.api import router as storage_router
+from storage_app.database import init_db
+from storage_app.events.listen import start_listening_events
 
 
 @asynccontextmanager
