@@ -29,35 +29,11 @@ jobs:
         run: |
           docker-compose -f docker-compose.yml up -d --build
 
-      - name: Wait for RabbitMQ to be healthy
-        run: |
-          while [[ "$(docker-compose ps -q rabbitmq | xargs docker inspect -f '{{.State.Health.Status}}')" != "healthy" ]]; do
-            echo "Waiting for RabbitMQ to be healthy..."
-            sleep 5
-          done
-          echo "RabbitMQ is healthy!"
-
       - name: Check containers
         run: |
           docker-compose ps
 
-      - name: Wait for organization_service to be ready
-        run: |
-          timeout=15
-          elapsed=0
-          while ! curl --silent --fail http://localhost:8000/api/health && [ $elapsed -lt $timeout ]; do
-            echo "Waiting for organization_service to be ready..."
-            sleep 5
-            elapsed=$((elapsed + 5))
-          done
-          if [ $elapsed -ge $timeout ]; then
-            echo "organization_service did not become ready in time!"
-            exit 1
-          fi
-          echo "organization_service is ready!"
-
-
-      - name: Run tests
+      - name: Run simple curl tests
         run: |
           curl --fail http://localhost:8000/api/health
           curl --fail http://localhost:8001/api/health

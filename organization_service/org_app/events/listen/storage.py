@@ -24,7 +24,7 @@ def listen_storage_created_event() -> None:
     channel = connection.channel()
     channel.queue_declare(queue="storage_created")
 
-    def callback(ch: Channel, method: Basic.Deliver, properties: BasicProperties, body: bytes):
+    def callback(ch: Channel, method: Basic.Deliver, properties: BasicProperties, body: bytes) -> None:
         """
         Обработчик событий, который вызывает создание копии хранилища.
 

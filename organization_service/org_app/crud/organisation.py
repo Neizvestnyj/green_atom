@@ -2,6 +2,7 @@ from typing import Sequence
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm.attributes import flag_modified
 
 from org_app.models.organisation import Organisation
 from org_app.schemas.organisation import OrganisationCreateSchema
@@ -49,6 +50,33 @@ async def get_organisation(db: AsyncSession, organisation_id: int) -> Organisati
     result = await db.execute(select(Organisation).where(Organisation.id == organisation_id))
 
     return result.scalar_one_or_none()
+
+
+async def update_organisation_capacity(db: AsyncSession, organisation_id: int, waste_data: dict) -> Organisation:
+    """
+    Обновляем информацию об организации
+
+    :param db: Асинхронная сессия базы данных
+    :param organisation_id: Идентификатор организации
+    :param waste_data: Словарь отходов, которые удалось утилизировать - {"Пластик": 10, "Биоотходы": 50}
+    :return: Обновленную организацию
+    """
+
+    # Используем асинхронный запрос для поиска организации по id
+    result = await db.execute(select(Organisation).filter_by(id=organisation_id))
+    organisation = result.scalars().first()
+
+    if organisation:
+        # Обновляем capacity в организации для каждого типа отходов
+        for waste_type, amount in waste_data.items():
+            # Обновляем текущий объем отходов
+            organisation.capacity[waste_type][0] += amount
+
+        flag_modified(organisation, 'capacity')
+        db.add(organisation)
+        await db.commit()
+
+        return organisation
 
 
 async def delete_all_organisations(db: AsyncSession) -> Sequence[Organisation]:

@@ -21,7 +21,7 @@ def listen_organisation_created_event() -> None:
     channel = connection.channel()
     channel.queue_declare(queue="organisation_created")
 
-    def callback(ch: Channel, method: Basic.Deliver, properties: BasicProperties, body: bytes):
+    def callback(ch: Channel, method: Basic.Deliver, properties: BasicProperties, body: bytes) -> None:
         """
         Обработчик сообщений из очереди, который создает копию организации.
 
@@ -56,7 +56,7 @@ def listen_organisations_deleted_event() -> None:
     channel = connection.channel()
     channel.queue_declare(queue="organisations_delete")
 
-    def callback(ch: Channel, method: Basic.Deliver, properties: BasicProperties, body: bytes):
+    def callback(ch: Channel, method: Basic.Deliver, properties: BasicProperties, body: bytes) -> None:
         """
         Обработчик сообщений из очереди, который удаляет организации по id.
 

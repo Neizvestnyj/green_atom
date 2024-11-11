@@ -7,9 +7,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from org_app.crud.organisation import (create_organisation as crud_create_organisation,
                                        get_all_organisations as crud_get_all_organisations,
                                        delete_all_organisations as crud_delete_all_organisations,
+                                       update_organisation_capacity as crud_update_organisation_capacity,
                                        )
-from org_app.events.send.organisation import send_organisation_created_event, \
-    send_organisations_delete_event
+from org_app.crud.storage import update_storage_copy_capacity as crud_update_storage_copy_capacity
+from org_app.events.send.organisation import (send_organisation_created_event,
+                                              send_organisations_delete_event,
+                                              )
+from org_app.events.send.storage import send_update_capacity_event
 from org_app.models.organisation import Organisation
 from org_app.schemas.organisation import OrganisationSchema, OrganisationCreateSchema
 from org_app.schemas.recycle import RecycleRequestSchema, RecycleResponseSchema
@@ -84,13 +88,24 @@ async def recycle(
 
     :param recycle_request: запрос, содержащий ID организации и список типов отходов.
     :param db: асинхронная сессия базы данных.
-    :return: словарь с хранилищами и количеством отходов для отправки.
+    :return: словарь с хранилищами и количеством отходов для отправки, а также сообщение
     """
 
     # Находим ближайшие доступные хранилища и определяем, куда можно поместить отходы
-    storage_plan = await find_nearest_storage(db, recycle_request.organisation_id)
+    storage_plan, total_sent_waste, all_waste_processed = await find_nearest_storage(db,
+                                                                                     recycle_request.organisation_id)
+
+    if all_waste_processed:
+        return RecycleResponseSchema(storage_plan={}, message="Все отходы были успешно переработаны")
 
     if not storage_plan:
         raise HTTPException(status_code=404, detail="Нет доступных хранилищ для утилизации отходов")
 
-    return RecycleResponseSchema(storage_plan=storage_plan)
+    await crud_update_organisation_capacity(db, recycle_request.organisation_id, total_sent_waste)
+
+    for storage_id in storage_plan:
+        updated_capacity = storage_plan[storage_id]
+        await crud_update_storage_copy_capacity(db, storage_id, updated_capacity)
+        send_update_capacity_event(storage_id, updated_capacity)
+
+    return RecycleResponseSchema(storage_plan=storage_plan, message="Отходы были распределены по хранилищам")

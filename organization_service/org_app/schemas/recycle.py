@@ -20,6 +20,8 @@ class RecycleResponseSchema(BaseModel):
     :param storage_plan: Словарь, содержащий ID хранилища и объемы отходов, которые
                          можно туда передать.
                          Пример: {1: {"Стекло": 50, "Биоотходы": 100}, 2: {"Стекло": 50}}
+    :param message: Сообщение о статусе переработки
     """
 
     storage_plan: Dict[int, Dict[str, int]]
+    message: str
