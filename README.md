@@ -19,3 +19,8 @@ windows https://stackoverflow.com/questions/61768347/rabbit-mq-error-unable-to-p
 ```shell
 docker-compose up --build
 ```
+
+# Запуск тестов
+```shell
+pytest
+```
