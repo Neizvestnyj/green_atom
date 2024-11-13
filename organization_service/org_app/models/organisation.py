@@ -18,7 +18,7 @@ class Organisation(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, index=True)
-    capacity = Column(JSON, nullable=False)  # Стекло, пластик, биоотходы
+    capacity = Column(JSON, nullable=False)
 
     # Связь с таблицей копий расстояний
     storage_distances_copy = relationship(
