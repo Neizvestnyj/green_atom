@@ -91,12 +91,17 @@ async def recycle(
     :return: словарь с хранилищами и количеством отходов для отправки, а также сообщение
     """
 
-    # Находим ближайшие доступные хранилища и определяем, куда можно поместить отходы
-    storage_plan, total_sent_waste, all_waste_processed = await find_nearest_storage(db,
-                                                                                     recycle_request.organisation_id)
+    org_id = recycle_request.organisation_id
+    organisation = await db.get(Organisation, org_id)
 
-    if all_waste_processed:
-        return RecycleResponseSchema(storage_plan={}, message="Все отходы были успешно переработаны")
+    if not organisation:
+        raise ValueError(f"Organisation with id {org_id} not found")
+
+    if organisation.is_all_waste_processed():
+        return RecycleResponseSchema(storage_plan={}, message="Все отходы уже были успешно переработаны")
+
+    # Находим ближайшие доступные хранилища и определяем, куда можно поместить отходы
+    storage_plan, total_sent_waste, remaining_waste = await find_nearest_storage(db, org_id)
 
     if not storage_plan:
         raise HTTPException(status_code=404, detail="Нет доступных хранилищ для утилизации отходов")
