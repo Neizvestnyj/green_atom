@@ -27,3 +27,15 @@ class Organisation(Base):
         cascade="all, delete-orphan",  # Удаление зависимых объектов при удалении организации
         single_parent=True,  # Ограничивает создание только одного родительского объекта
     )
+
+    def is_all_waste_processed(self) -> bool:
+        """
+        Проверяет, все ли отходы переработаны.
+        :return: Если для всех типов отходов переработано максимальное количество, возвращает True, иначе False.
+        """
+
+        for waste_type, (used, total) in self.capacity.items():
+            if total > used:  # Если есть отходы, которые не переработаны
+                return False
+
+        return True
