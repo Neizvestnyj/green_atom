@@ -78,7 +78,7 @@ async def delete_all_organisations(db: AsyncSession = Depends(get_db)) -> Sequen
     return organisations
 
 
-@router.post("/recycle", response_model=RecycleResponseSchema)
+@router.post("/recycle/", response_model=RecycleResponseSchema)
 async def recycle(
         recycle_request: RecycleRequestSchema,
         db: AsyncSession = Depends(get_db),
