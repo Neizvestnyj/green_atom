@@ -17,7 +17,7 @@ def listen_storage_capacity_event() -> None:
 
     connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_HOST))
     channel = connection.channel()
-    channel.queue_declare(queue="organisation_created")
+    channel.queue_declare(queue="update_capacity")
 
     def callback(ch: Channel, method: Basic.Deliver, properties: BasicProperties, body: bytes) -> None:
         """
