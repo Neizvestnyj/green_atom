@@ -9,25 +9,13 @@ from org_app.models.storage_distance import StorageDistanceCopy
 
 
 async def find_nearest_storage(db: AsyncSession, organisation_id: int) -> tuple[
-    Dict[int, Dict[str, int]], Dict[str, int], bool]:
+    Dict[int, Dict[str, int]], Dict[str, int], Dict[str, int]]:
     """
     Найти ближайшие хранилища для утилизации отходов организации и вернуть информацию о переработанных отходах.
 
-    Функция принимает идентификатор организации, получает данные об отходах, которые она
-    может утилизировать, и находит ближайшие хранилища, которые могут принять эти отходы.
-    Функция возвращает план распределения отходов по хранилищам и общий объем переработанных отходов.
-
     :param db: Асинхронная сессия базы данных, используемая для выполнения запросов.
     :param organisation_id: Идентификатор организации, для которой нужно найти ближайшие хранилища.
-
-    :return: Словарь с распределением отходов, общий объем переработанных отходов и флаг, указывающий, переработаны ли все отходы.
-    {
-        3: {'Пластик': 10, 'Биоотходы': 50},
-        6: {'Пластик': 50},
-        5: {'Стекло': 20}
-    },
-    {'Пластик': 60, 'Стекло': 20, 'Биоотходы': 50},
-    False
+    :return: Словарь с распределением отходов, общий объем переработанных отходов и остатки отходов, которые не поместились.
     """
 
     # Получаем данные организации, включая её доступные объёмы отходов
@@ -37,10 +25,8 @@ async def find_nearest_storage(db: AsyncSession, organisation_id: int) -> tuple[
 
     storage_plan = {}
     total_sent_waste = {}
+    remaining_waste = {}  # Словарь для отслеживания непоместившихся отходов
     organisation_capacity = organisation.capacity
-
-    # Проверяем, все ли отходы уже переработаны
-    all_waste_processed = True  # Переменная для проверки переработки всех отходов
 
     # Получаем все записи расстояний, связанных с данной организацией
     storage_distances = await db.execute(
@@ -53,14 +39,11 @@ async def find_nearest_storage(db: AsyncSession, organisation_id: int) -> tuple[
         if remaining <= 0:
             continue
 
-        all_waste_processed = False  # Если хотя бы один тип отходов не переработан, меняем флаг
-
         # Сортируем хранилища по расстоянию от данной организации
         sorted_distances = sorted(storage_distances, key=lambda x: x.distance)
 
         for distance in sorted_distances:
             storage_id = distance.storage_id
-
             storage_copy = await get_storage_copy(db, storage_id)
             if not storage_copy:
                 continue
@@ -70,10 +53,12 @@ async def find_nearest_storage(db: AsyncSession, organisation_id: int) -> tuple[
                 if storage_capacity_left > 0:
                     amount_to_store = min(remaining, storage_capacity_left)
 
+                    # Обновляем план хранения
                     if storage_id not in storage_plan:
                         storage_plan[storage_id] = {}
                     storage_plan[storage_id][waste_type] = amount_to_store
 
+                    # Обновляем общий объем переработанных отходов
                     if waste_type not in total_sent_waste:
                         total_sent_waste[waste_type] = 0
                     total_sent_waste[waste_type] += amount_to_store
@@ -83,4 +68,8 @@ async def find_nearest_storage(db: AsyncSession, organisation_id: int) -> tuple[
                     if remaining <= 0:
                         break
 
-    return storage_plan, total_sent_waste, all_waste_processed
+        # Если после всех попыток распределить отходы остался остаток, добавляем его в словарь remaining_waste
+        if remaining > 0:
+            remaining_waste[waste_type] = remaining
+
+    return storage_plan, total_sent_waste, remaining_waste
