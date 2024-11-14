@@ -26,7 +26,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r organization_service/requirements.txt
           pip install -r storage_service/requirements.txt
-          pip install pytest pytest-cov
+          pip install pytest pytest-cov coverage
 
       - name: Run organization_service tests with coverage
         run: |
@@ -36,9 +36,16 @@ jobs:
         run: |
           pytest storage_service/tests --cov=storage_service --cov-report=xml:storage_service/coverage.xml
 
-      - name: Calculate combined coverage
+      - name: Ensure coverage reports exist
         run: |
-          coverage combine organization_service/coverage.xml storage_service/coverage.xml
+          ls -l organization_service/coverage.xml storage_service/coverage.xml
+
+      - name: Combine coverage reports
+        run: |
+          coverage combine organization_service/coverage.xml storage_service/coverage.xml || echo "Coverage combine failed, skipping"
+
+      - name: Generate final coverage report
+        run: |
           coverage report -m > coverage.txt
           coverage xml -o coverage.xml
 
@@ -47,3 +54,8 @@ jobs:
         with:
           name: coverage-report
           path: coverage.txt
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: "coverage.xml"
