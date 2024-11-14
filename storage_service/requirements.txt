@@ -4,6 +4,4 @@ pika
 pydantic
 aiosqlite
 sqlalchemy
-pytest
-pytest_asyncio
-httpx
+pika

@@ -24,25 +24,19 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r organization_service/requirements.txt
-          pip install -r storage_service/requirements.txt
-          pip install pytest pytest-cov coverage
+          pip install -r organization_service/requirements.txt -r storage_service/requirements.txt -r requirements-test.txt
 
       - name: Run organization_service tests with coverage
         run: |
-          pytest organization_service/tests --cov=organization_service --cov-report=xml:organization_service/coverage.xml
+          pytest organization_service/tests --cov=organization_service
 
       - name: Run storage_service tests with coverage
         run: |
-          pytest storage_service/tests --cov=storage_service --cov-report=xml:storage_service/coverage.xml
-
-      - name: Ensure coverage reports exist
-        run: |
-          ls -l organization_service/coverage.xml storage_service/coverage.xml
+          pytest storage_service/tests --cov=storage_service
 
       - name: Combine coverage reports
         run: |
-          coverage combine organization_service/coverage.xml storage_service/coverage.xml || echo "Coverage combine failed, skipping"
+          coverage combine || echo "Coverage combine failed, skipping"
 
       - name: Generate final coverage report
         run: |
