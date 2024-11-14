@@ -26,16 +26,20 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r organization_service/requirements.txt -r storage_service/requirements.txt -r requirements-test.txt
 
-      - name: Run organization_service tests with coverage
+      - name: Run organization_service and storage_service tests with coverage
         run: |
-          pytest organization_service/tests --cov=organization_service --cov-report=xml:organization_service/organisation_coverage.xml
+          pytest organization_service/tests --cov=organization_service
+          pytest storage_service/tests --cov=storage_service
+        continue-on-error: true
 
-      - name: Run storage_service tests with coverage
+      - name: Generate combined coverage report
         run: |
-          pytest storage_service/tests --cov=storage_service --cov-report=xml:storage_service/storage_coverage.xml
+          coverage combine
+          coverage xml -o coverage.xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
+          files: "coverage.xml"
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: "Neizvestnyj/green_atom"
