@@ -28,15 +28,15 @@ jobs:
 
       - name: Run organization_service tests with coverage
         run: |
-          pytest organization_service/tests --cov=organization_service
+          pytest organization_service/tests --cov=organization_service --cov-report=xml:organization_service/coverage.xml --cov-report=term-missing
 
       - name: Run storage_service tests with coverage
         run: |
-          pytest storage_service/tests --cov=storage_service
+          pytest storage_service/tests --cov=storage_service --cov-report=xml:storage_service/coverage.xml --cov-report=term-missing
 
       - name: Combine coverage reports
         run: |
-          coverage combine || echo "Coverage combine failed, skipping"
+          coverage combine organization_service/coverage.xml storage_service/coverage.xml || echo "Coverage combine failed, skipping"
 
       - name: Generate final coverage report
         run: |
