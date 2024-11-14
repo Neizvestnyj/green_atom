@@ -1,4 +1,4 @@
-[![Codecov](https://codecov.io/gh/Neizvestnyj/green_atom/branch/master/graph/badge.svg)](https://codecov.io/gh/Neizvestnyj/green_atom)
+[![codecov](https://codecov.io/gh/Neizvestnyj/green_atom/branch/master/graph/badge.svg?token=RZJYZXF5WD)](https://codecov.io/gh/Neizvestnyj/green_atom)
 
 Для локального запуска ставим https://www.erlang.org/downloads
 Потом https://www.rabbitmq.com/docs/install-windows#installer
