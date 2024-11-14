@@ -14,7 +14,7 @@ async def create_organisation(db_session: AsyncSession,
                               capacity: Dict[str, list[int]],
                               ) -> Organisation:
     """
-    Создание новой организации в тестовой базе данных..
+    Создание новой организации в тестовой базе данных.
 
     :param db_session: Сессия базы данных для выполнения запросов.
     :param name: Имя создаваемой организации.
@@ -33,8 +33,6 @@ async def create_organisation(db_session: AsyncSession,
 async def create_storage(db_session: AsyncSession, capacity: Dict[str, list[int]]) -> StorageCopy:
     """
     Создание нового хранилища для отходов в тестовой базе данных.
-
-    Функция создает хранилище с указанной ёмкостью для хранения отходов.
 
     :param db_session: Сессия базы данных для выполнения запросов.
     :param capacity: Словарь, содержащий типы отходов и ёмкости для хранилища.
@@ -56,9 +54,6 @@ async def create_distance(db_session: AsyncSession,
                           ) -> StorageDistanceCopy:
     """
     Установка расстояния между организацией и хранилищем.
-
-    Функция создает запись о расстоянии между организацией и хранилищем, чтобы можно было
-    учитывать расстояние при перераспределении отходов.
 
     :param db_session: Сессия базы данных для выполнения запросов.
     :param storage_id: Идентификатор хранилища.

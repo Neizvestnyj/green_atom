@@ -71,7 +71,7 @@ async def delete_all_organisations(db: AsyncSession = Depends(get_db)) -> Sequen
 
     organisations = await crud_delete_all_organisations(db)
     if not organisations:
-        raise HTTPException(status_code=404, detail="No organisations found to delete")
+        raise HTTPException(status_code=404, detail="Не найдено организаций для удаления")
 
     send_organisations_delete_event(organisations)
 

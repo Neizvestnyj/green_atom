@@ -9,8 +9,6 @@ from httpx import AsyncClient
 @patch("storage_app.api.send_storage_created_event", autospec=True)
 async def test_create_storage(mock_send_event: AsyncMock, async_client: AsyncClient) -> None:
     """
-    Тестирование создания организации через API.
-
     Функция тестирует создание новой организации с заданными параметрами и проверяет,
     что событие о создании организации было отправлено.
 

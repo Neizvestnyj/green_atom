@@ -12,8 +12,6 @@ from .factories import create_organisation
 @patch("org_app.api.send_organisation_created_event", autospec=True)
 async def test_create_organisation(mock_send_event: AsyncMock, async_client: AsyncClient) -> None:
     """
-    Тестирование создания организации через API.
-
     Функция тестирует создание новой организации с заданными параметрами и проверяет,
     что событие о создании организации было отправлено.
 
@@ -64,8 +62,7 @@ async def test_delete_empty_organisations(async_client: AsyncClient) -> None:
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
     response_json = response.json()
-    assert "detail" in response_json
-    assert response_json["detail"] == "No organisations found to delete"
+    assert response_json["detail"] == "Не найдено организаций для удаления"
 
 
 @pytest.mark.asyncio
