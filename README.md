@@ -1,3 +1,5 @@
+![Codecov Badge](https://codecov.io/gh/${{ github.repository }}/branch/master/graph/badge.svg)
+
 Для локального запуска ставим https://www.erlang.org/downloads
 Потом https://www.rabbitmq.com/docs/install-windows#installer
 https://redisant.com/rta
