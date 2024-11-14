@@ -1,0 +1,48 @@
+name: Test Coverage Workflow
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov
+
+      - name: Run organization_service tests with coverage
+        run: |
+          pytest organization_service/tests --cov=organization_service --cov-report=xml:organization_service/coverage.xml
+
+      - name: Run storage_service tests with coverage
+        run: |
+          pytest storage_service/tests --cov=storage_service --cov-report=xml:storage_service/coverage.xml
+
+      - name: Calculate combined coverage
+        run: |
+          coverage combine organization_service/coverage.xml storage_service/coverage.xml
+          coverage report -m > coverage.txt
+          coverage xml -o coverage.xml
+
+      - name: Upload coverage report as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage-report
+          path: coverage.txt
