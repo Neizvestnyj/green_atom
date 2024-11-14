@@ -26,15 +26,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r organization_service/requirements.txt -r storage_service/requirements.txt -r requirements-test.txt
 
-      - name: Run organization_service and storage_service tests with coverage
+      - name: Run organization_service tests with coverage
         run: |
-          pytest organization_service/tests --cov=organization_service
-          pytest storage_service/tests --cov=storage_service
-        continue-on-error: true
+          COVERAGE_FILE=.coverage_organization pytest organization_service/tests --cov=organization_service
+
+      - name: Run storage_service tests with coverage
+        run: |
+          COVERAGE_FILE=.coverage_storage pytest storage_service/tests --cov=storage_service
 
       - name: Generate combined coverage report
         run: |
-          coverage combine
+          coverage combine .coverage_organization .coverage_storage
           coverage xml -o coverage.xml
 
       - name: Upload coverage to Codecov
