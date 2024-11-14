@@ -9,6 +9,28 @@ from .factories import create_organisation, create_storage, create_distance
 
 
 @pytest.mark.asyncio
+async def test_recycle_empty_organisation(async_client: AsyncClient,
+                                          db_session: AsyncSession,
+                                          ) -> None:
+    """
+    Функция создает организацию и два хранилища, затем проверяет перераспределение отходов по хранилищам с учётом расстояний.
+    Проверяется, что событие обновления ёмкости хранилища вызвано дважды.
+
+    :param async_client: Асинхронный клиент для выполнения HTTP-запросов.
+    :param db_session: Сессия базы данных для создания данных в тестах.
+    :return: None
+    """
+
+    organisation_id = 100
+    data = {"organisation_id": organisation_id}
+
+    response = await async_client.post("/api/recycle/", json=data)
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.json()["detail"] == f"Организация с идентификатором {organisation_id} не найдена"
+
+
+@pytest.mark.asyncio
 @patch("org_app.api.send_update_capacity_event")
 async def test_recycle_all_waste(mock_update_storage: AsyncMock,
                                  async_client: AsyncClient,

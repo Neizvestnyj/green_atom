@@ -95,7 +95,7 @@ async def recycle(
     organisation = await db.get(Organisation, org_id)
 
     if not organisation:
-        raise ValueError(f"Organisation with id {org_id} not found")
+        raise HTTPException(status_code=404, detail=f"Организация с идентификатором {org_id} не найдена")
 
     if organisation.is_all_waste_processed():
         return RecycleResponseSchema(storage_plan={}, message="Все отходы уже были успешно переработаны")
