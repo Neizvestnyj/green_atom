@@ -42,7 +42,7 @@ jobs:
           coverage xml -o coverage.xml
 
       - name: Upload coverage report as artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: coverage-report
           path: coverage.txt
