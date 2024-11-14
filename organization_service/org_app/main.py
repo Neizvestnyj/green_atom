@@ -5,7 +5,7 @@ from fastapi import FastAPI
 
 from org_app.api import router as organisations_router
 from org_app.database import init_db
-from org_app.events.listen import start_listening_events
+from org_app.events.consumers import start_listening_events
 
 
 @asynccontextmanager

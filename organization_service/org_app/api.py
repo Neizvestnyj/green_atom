@@ -10,10 +10,10 @@ from org_app.crud.organisation import (create_organisation as crud_create_organi
                                        update_organisation_capacity as crud_update_organisation_capacity,
                                        )
 from org_app.crud.storage import update_storage_copy_capacity as crud_update_storage_copy_capacity
-from org_app.events.send.organisation import (send_organisation_created_event,
-                                              send_organisations_delete_event,
-                                              )
-from org_app.events.send.storage import send_update_capacity_event
+from org_app.events.producers.organisation import (send_organisation_created_event,
+                                                   send_organisations_delete_event,
+                                                   )
+from org_app.events.producers.storage import send_update_capacity_event
 from org_app.models.organisation import Organisation
 from org_app.schemas.organisation import OrganisationSchema, OrganisationCreateSchema
 from org_app.schemas.recycle import RecycleRequestSchema, RecycleResponseSchema

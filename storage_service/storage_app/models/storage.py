@@ -20,7 +20,7 @@ class Storage(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, index=True)
     location = Column(String, nullable=False)
-    capacity = Column(JSON, nullable=False)  # Например, стекло, пластик и т.д.
+    capacity = Column(JSON, nullable=False)
 
     storage_distances = relationship("StorageDistance",
                                      back_populates="storage",

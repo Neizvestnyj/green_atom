@@ -3,12 +3,14 @@ from typing import Sequence
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from storage_app.crud.storage import create_storage as crud_create_storage, \
-    get_all_storages as crud_get_all_storages
-from storage_app.crud.storage_distance import get_all_storage_distances as crud_get_all_storage_distances, \
-    create_storage_distance as crud_create_storage_distance
-from storage_app.events.send.storage import send_storage_created_event
-from storage_app.events.send.storage_distance import send_storage_distance_created_event
+from storage_app.crud.storage import (create_storage as crud_create_storage,
+                                      get_all_storages as crud_get_all_storages,
+                                      )
+from storage_app.crud.storage_distance import (get_all_storage_distances as crud_get_all_storage_distances,
+                                               create_storage_distance as crud_create_storage_distance,
+                                               )
+from storage_app.events.producers.storage import send_storage_created_event
+from storage_app.events.producers.storage_distance import send_storage_distance_created_event
 from storage_app.models.storage import Storage
 from storage_app.models.storage_distance import StorageDistance
 from storage_app.schemas.storage import StorageSchema, StorageSchemaCreateSchema

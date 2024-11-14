@@ -21,6 +21,16 @@ docker-compose up --build
 ```
 
 # Запуск тестов
+
 ```shell
-pytest
+pytest organization_service/tests
+pytest storage_service/tests
+```
+
+## Тесты с данными о покрытии
+```shell
+coverage run -m pytest organization_service/tests
+coverage run -m pytest storage_service/tests
+coverage report -m
+coverage html
 ```

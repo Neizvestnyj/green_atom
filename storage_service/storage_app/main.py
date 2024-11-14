@@ -5,7 +5,7 @@ from fastapi import FastAPI
 
 from storage_app.api import router as storage_router
 from storage_app.database import init_db
-from storage_app.events.listen import start_listening_events
+from storage_app.events.consumers import start_listening_events
 
 
 @asynccontextmanager
