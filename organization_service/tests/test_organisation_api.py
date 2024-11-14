@@ -28,20 +28,30 @@ async def test_create_organisation(mock_send_event: AsyncMock, async_client: Asy
         }
     }
     response = await async_client.post("/api/organisations/", json=data)
+    resp_data = response.json()
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.json()["name"] == data["name"]
+    assert resp_data["name"] == data["name"]
+    assert resp_data["capacity"] == data["capacity"]
     mock_send_event.assert_called_once()
 
 
 @pytest.mark.asyncio
-async def test_get_organisations(async_client: AsyncClient) -> None:
+async def test_get_organisations(async_client: AsyncClient, db_session: AsyncSession) -> None:
     """
     Функция проверяет правильность работы эндпоинта для получения списка всех организаций.
 
     :param async_client: Асинхронный клиент для выполнения HTTP-запросов.
+    :param db_session: Сессия базы данных для создания организации в тестах.
     :return: None
     """
+
+    await create_organisation(db_session,
+                              name="New Test Organisation",
+                              capacity={
+                                  "Пластик": [0, 50],
+                              },
+                              )
 
     response = await async_client.get("/api/organisations/")
 
@@ -67,8 +77,10 @@ async def test_delete_empty_organisations(async_client: AsyncClient) -> None:
 
 @pytest.mark.asyncio
 @patch("org_app.api.send_organisations_delete_event", autospec=True)
-async def test_delete_all_organisations(mock_send_event: AsyncMock, async_client: AsyncClient,
-                                        db_session: AsyncSession) -> None:
+async def test_delete_all_organisations(mock_send_event: AsyncMock,
+                                        async_client: AsyncClient,
+                                        db_session: AsyncSession,
+                                        ) -> None:
     """
     Функция создает организацию, а затем проверяет, что событие о ее удалении было отправлено после успешного удаления.
 
