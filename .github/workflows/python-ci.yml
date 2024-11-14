@@ -28,11 +28,11 @@ jobs:
 
       - name: Run organization_service tests with coverage
         run: |
-          COVERAGE_FILE=.coverage_organization pytest organization_service/tests --cov=organization_service --cov-report=term-missing
+          COVERAGE_FILE=.coverage_organization pytest organization_service/tests --cov=organization_service --cov-report=term-missing --concurrency=gevent
 
       - name: Run storage_service tests with coverage
         run: |
-          COVERAGE_FILE=.coverage_storage pytest storage_service/tests --cov=storage_service --cov-report=term-missing
+          COVERAGE_FILE=.coverage_storage pytest storage_service/tests --cov=storage_service --cov-report=term-missing --concurrency=gevent
 
       - name: Generate combined coverage report
         run: |
