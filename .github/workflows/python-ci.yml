@@ -40,23 +40,10 @@ jobs:
         run: |
           ls -l organization_service/coverage.xml storage_service/coverage.xml
 
-      - name: Combine coverage reports
-        run: |
-          coverage combine organization_service/coverage.xml storage_service/coverage.xml || echo "Coverage combine failed, skipping"
-
-      - name: Generate final coverage report
-        run: |
-          coverage report -m > coverage.txt
-          coverage xml -o coverage.xml
-
-      - name: Upload coverage report as artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: coverage-report
-          path: coverage.txt
-
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
-          files: "coverage.xml"
+          files: |
+            organization_service/coverage.xml
+            storage_service/coverage.xml
           token: ${{ secrets.CODECOV_TOKEN }}
