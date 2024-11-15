@@ -7,7 +7,6 @@ from org_app.api import router as organisations_router
 from org_app.database import init_db
 from org_app.events.consumers import start_listening_events
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """
@@ -27,7 +26,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 
 app = FastAPI(lifespan=lifespan)
-app.include_router(organisations_router, prefix="/organisation/api", tags=["organisations"])
+app.include_router(organisations_router, prefix="/api", tags=["organisations"])
 
 if __name__ == "__main__":
     import uvicorn
