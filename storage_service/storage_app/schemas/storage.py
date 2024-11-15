@@ -3,7 +3,7 @@ from typing import Dict
 from pydantic import BaseModel, ConfigDict
 
 
-class StorageSchemaBaseSchema(BaseModel):
+class StorageBaseSchema(BaseModel):
     """
     Базовая модель для хранения информации о хранилище.
 
@@ -19,9 +19,9 @@ class StorageSchemaBaseSchema(BaseModel):
     capacity: Dict[str, list]
 
 
-class StorageSchemaCreateSchema(StorageSchemaBaseSchema):
+class StorageCreateSchema(StorageBaseSchema):
     """
-    Модель для создания нового хранилища. Наследует от StorageSchemaBaseSchema.
+    Модель для создания нового хранилища. Наследует от StorageBaseSchema.
 
     Используется при создании нового хранилища, например, через API.
     """
@@ -29,7 +29,7 @@ class StorageSchemaCreateSchema(StorageSchemaBaseSchema):
     pass
 
 
-class StorageSchema(StorageSchemaBaseSchema):
+class StorageSchema(StorageBaseSchema):
     """
     Модель для хранения информации о хранилище с его уникальным идентификатором.
 

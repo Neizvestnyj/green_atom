@@ -13,7 +13,7 @@ from storage_app.events.producers.storage import send_storage_created_event
 from storage_app.events.producers.storage_distance import send_storage_distance_created_event
 from storage_app.models.storage import Storage
 from storage_app.models.storage_distance import StorageDistance
-from storage_app.schemas.storage import StorageSchema, StorageSchemaCreateSchema
+from storage_app.schemas.storage import StorageSchema, StorageCreateSchema
 from storage_app.schemas.storage_distance import StorageDistanceSchema, StorageDistanceBaseSchema
 from .database import get_db
 
@@ -27,7 +27,7 @@ async def health_check():
 
 @router.post("/storages/", response_model=StorageSchema)
 async def create_storage(
-        storage: StorageSchemaCreateSchema,
+        storage: StorageCreateSchema,
         db: AsyncSession = Depends(get_db),
 ) -> Storage:
     """

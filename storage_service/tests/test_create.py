@@ -8,7 +8,7 @@ from storage_app.models.organisation import OrganisationCopy
 from storage_app.models.storage import Storage
 from storage_app.models.storage_distance import StorageDistance
 from storage_app.schemas.organisation import OrganisationCopySchema
-from storage_app.schemas.storage import StorageSchemaCreateSchema
+from storage_app.schemas.storage import StorageCreateSchema
 from storage_app.schemas.storage_distance import StorageDistanceBaseSchema
 from .factories import create_organisation, create_storage
 
@@ -48,7 +48,7 @@ async def test_create_storage(db_session: AsyncSession) -> None:
     location = 'Москва'
     capacity = {"Пластик": [0, 60]}
 
-    storage_data = StorageSchemaCreateSchema(name=name, location=location, capacity=capacity)
+    storage_data = StorageCreateSchema(name=name, location=location, capacity=capacity)
     storage = await crud_create_storage(db=db_session, storage=storage_data)
 
     # Проверяем, что хранилище было успешно создано

@@ -6,10 +6,10 @@ from sqlalchemy.future import select
 from sqlalchemy.orm.attributes import flag_modified
 
 from storage_app.models.storage import Storage
-from storage_app.schemas.storage import StorageSchemaCreateSchema
+from storage_app.schemas.storage import StorageCreateSchema
 
 
-async def create_storage(db: AsyncSession, storage: StorageSchemaCreateSchema) -> Storage:
+async def create_storage(db: AsyncSession, storage: StorageCreateSchema) -> Storage:
     """
     Создание нового хранилища.
 
