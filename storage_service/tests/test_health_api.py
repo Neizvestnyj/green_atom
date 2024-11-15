@@ -12,7 +12,7 @@ async def test_create_storage_distance(async_client: AsyncClient):
     :return: None
     """
 
-    response = await async_client.get("/api/health/")
+    response = await async_client.get("/api/v1/storage/health/")
 
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["status"] == "OK"

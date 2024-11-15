@@ -19,20 +19,21 @@ windows https://stackoverflow.com/questions/61768347/rabbit-mq-error-unable-to-p
 # Деплой
 
 ```shell
-docker-compose up --build
+docker-compose build
+docker-compose up -d
 ```
 
 # Запуск тестов
 
 ```shell
-pytest organization_service/tests
+pytest organisation_service/tests
 pytest storage_service/tests
 ```
 
 ## Тесты с данными о покрытии
 
 ```shell
-coverage run -m pytest organization_service/tests
+coverage run -m pytest organisation_service/tests
 coverage run -m pytest storage_service/tests
 coverage report -m
 coverage html

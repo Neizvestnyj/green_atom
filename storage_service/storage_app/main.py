@@ -27,7 +27,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 
 app = FastAPI(lifespan=lifespan)
-app.include_router(storage_router, prefix="/api", tags=["storages"])
+app.include_router(storage_router, prefix="/api/v1/storage", tags=["storages"])
 
 if __name__ == "__main__":
     import uvicorn
