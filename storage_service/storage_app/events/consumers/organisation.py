@@ -8,6 +8,7 @@ from pika.spec import Basic, BasicProperties
 from storage_app.crud.organisation import create_organisation_copy, delete_organisation_by_id
 from storage_app.database import AsyncSessionLocal
 from storage_app.events import RABBITMQ_HOST
+from storage_app.schemas.organisation import OrganisationCopySchema
 
 
 def listen_organisation_created_event() -> None:
@@ -37,7 +38,8 @@ def listen_organisation_created_event() -> None:
 
         async def handle_event():
             async with AsyncSessionLocal() as db:
-                await create_organisation_copy(db, organisation_id=organisation_id)
+                org_data = OrganisationCopySchema(id=organisation_id).load(db)
+                await create_organisation_copy(db, organisation=org_data)
 
         asyncio.run(handle_event())
 

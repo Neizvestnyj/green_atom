@@ -27,8 +27,6 @@ async def test_create_organisation(db_session: AsyncSession) -> None:
 
     organisation_data = OrganisationCreateSchema(name=name, capacity=capacity)
     organisation = await crud_create_organisation(db=db_session, org=organisation_data)
-    await db_session.commit()
-    await db_session.refresh(organisation)
 
     # Проверяем, что копия была успешно создана
     assert organisation.name == name
