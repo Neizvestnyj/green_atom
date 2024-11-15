@@ -37,7 +37,7 @@ jobs:
         run: |
           timeout=15
           elapsed=0
-          while ! curl --silent --fail http://localhost && [ $elapsed -lt $timeout ]; do
+          while ! curl --silent --fail http://localhost/health && [ $elapsed -lt $timeout ]; do
             echo "Waiting for services to be ready..."
             sleep 5
             elapsed=$((elapsed + 5))
