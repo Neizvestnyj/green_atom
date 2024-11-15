@@ -5,19 +5,19 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.attributes import flag_modified
 
 from org_app.models.storage import StorageCopy
+from org_app.schemas.storage import StorageCopySchema
 
 
-async def create_storage_copy(db: AsyncSession, storage_id: int, capacity: dict) -> StorageCopy:
+async def create_storage_copy(db: AsyncSession, storage: StorageCopySchema) -> StorageCopy:
     """
     Создание копии хранилища.
 
     :param db: асинхронная сессия базы данных
-    :param storage_id: идентификатор хранилища
-    :param capacity: вместимость хранилища
+    :param storage: данные для создания хранилища
     :return: созданная копия хранилища
     """
 
-    db_storage_copy = StorageCopy(id=storage_id, capacity=capacity)
+    db_storage_copy = StorageCopy(id=storage.id, capacity=storage.capacity)
     db.add(db_storage_copy)
     await db.commit()
     await db.refresh(db_storage_copy)

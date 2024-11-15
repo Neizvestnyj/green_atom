@@ -1,31 +1,26 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from org_app.models.storage_distance import StorageDistanceCopy
+from org_app.schemas.storage_distance import StorageDistanceCopySchema
 
 
 async def create_storage_distance_copy(
         db: AsyncSession,
-        storage_distance_id: int,
-        storage_id: int,
-        organisation_id: int,
-        distance: int,
+        storage_distance: StorageDistanceCopySchema,
 ) -> StorageDistanceCopy:
     """
     Создание копии записи о расстоянии между хранилищем и организацией.
 
     :param db: асинхронная сессия базы данных
-    :param storage_distance_id: идентификатор записи о расстоянии
-    :param storage_id: идентификатор хранилища
-    :param organisation_id: идентификатор организации
-    :param distance: расстояние между хранилищем и организацией
+    :param storage_distance: данные для создания `StorageDistanceCopy`
     :return: созданная копия записи о расстоянии
     """
 
     db_storage_distance_copy = StorageDistanceCopy(
-        id=storage_distance_id,
-        storage_id=storage_id,
-        organisation_id=organisation_id,
-        distance=distance,
+        id=storage_distance.id,
+        storage_id=storage_distance.storage_id,
+        organisation_id=storage_distance.organisation_id,
+        distance=storage_distance.distance,
     )
 
     db.add(db_storage_distance_copy)

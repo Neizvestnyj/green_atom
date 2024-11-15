@@ -8,6 +8,7 @@ from pika.spec import Basic, BasicProperties
 from org_app.crud.storage import create_storage_copy
 from org_app.database import AsyncSessionLocal
 from org_app.events import RABBITMQ_HOST
+from org_app.schemas.storage import StorageCopySchema
 
 
 def listen_storage_created_event() -> None:
@@ -43,8 +44,8 @@ def listen_storage_created_event() -> None:
 
         async def handle_event():
             async with AsyncSessionLocal() as db:
-                # Создаем копию хранилища
-                await create_storage_copy(db, storage_id=storage_id, capacity=capacity)
+                storage_copy_data = StorageCopySchema(id=storage_id, capacity=capacity)
+                await create_storage_copy(db, storage=storage_copy_data)
 
         asyncio.run(handle_event())
 

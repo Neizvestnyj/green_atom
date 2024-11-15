@@ -2,11 +2,9 @@ from typing import Dict
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from org_app.crud.organisation import create_organisation as crud_create_organisation
 from org_app.models.organisation import Organisation
 from org_app.models.storage import StorageCopy
 from org_app.models.storage_distance import StorageDistanceCopy
-from org_app.schemas.organisation import OrganisationCreateSchema
 
 
 async def create_organisation(db_session: AsyncSession,
@@ -22,8 +20,8 @@ async def create_organisation(db_session: AsyncSession,
     :return: Созданная организация.
     """
 
-    organisation_data = OrganisationCreateSchema(name=name, capacity=capacity)
-    organisation = await crud_create_organisation(db=db_session, org=organisation_data)
+    organisation = Organisation(name=name, capacity=capacity)
+    db_session.add(organisation)
     await db_session.commit()
     await db_session.refresh(organisation)
 

@@ -8,6 +8,7 @@ from pika.spec import Basic, BasicProperties
 from org_app.crud.storage_distance import create_storage_distance_copy
 from org_app.database import AsyncSessionLocal
 from org_app.events import RABBITMQ_HOST
+from org_app.schemas.storage_distance import StorageDistanceCopySchema
 
 
 def listen_storage_distance_created_event() -> None:
@@ -45,12 +46,13 @@ def listen_storage_distance_created_event() -> None:
 
         async def handle_event():
             async with AsyncSessionLocal() as db:
-                # Создаем копию записи о расстоянии
+                storage_distance_data = StorageDistanceCopySchema(id=storage_distance_id,
+                                                                  storage_id=storage_id,
+                                                                  organisation_id=organisation_id,
+                                                                  distance=distance,
+                                                                  )
                 await create_storage_distance_copy(db,
-                                                   storage_distance_id=storage_distance_id,
-                                                   storage_id=storage_id,
-                                                   organisation_id=organisation_id,
-                                                   distance=distance,
+                                                   storage_distance=storage_distance_data,
                                                    )
 
         asyncio.run(handle_event())
