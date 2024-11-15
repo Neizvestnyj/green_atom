@@ -50,7 +50,7 @@ jobs:
 
       - name: Run simple curl tests
         run: |
-          curl --fail http://localhost/api/v1/orgnanisation/health/
+          curl --fail http://localhost/api/v1/organisation/health/
           curl --fail http://localhost/api/v1/storage/health/
 
       - name: Shut down Docker Compose
