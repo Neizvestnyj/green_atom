@@ -1,7 +1,6 @@
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .factories import create_organisation, create_storage
 from org_app.crud.organisation import create_organisation as crud_create_organisation
 from org_app.crud.storage import create_storage_copy as crud_create_storage
 from org_app.crud.storage_distance import create_storage_distance_copy as crud_create_storage_distance
@@ -11,6 +10,7 @@ from org_app.models.storage_distance import StorageDistanceCopy
 from org_app.schemas.organisation import OrganisationCreateSchema
 from org_app.schemas.storage import StorageCopySchema
 from org_app.schemas.storage_distance import StorageDistanceCopySchema
+from .factories import create_organisation, create_storage
 
 
 @pytest.mark.asyncio
