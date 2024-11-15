@@ -32,7 +32,7 @@ async def test_create_storage_distance(mock_send_event: AsyncMock,
                                    )
 
     data = {"storage_id": storage.id, "organisation_id": organisation.id, "distance": 100}
-    response = await async_client.post("/storage/api/storage_distances/", json=data)
+    response = await async_client.post("/api/storage_distances/", json=data)
 
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["distance"] == data["distance"]
@@ -48,6 +48,6 @@ async def test_get_storage_distances(async_client: AsyncClient) -> None:
     :return: None
     """
 
-    response = await async_client.get("/storage/api/storage_distances/")
+    response = await async_client.get("/api/storage_distances/")
     assert response.status_code == status.HTTP_200_OK
     assert isinstance(response.json(), list)

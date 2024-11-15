@@ -23,7 +23,7 @@ async def test_recycle_empty_organisation(async_client: AsyncClient,
     organisation_id = 100
     data = {"organisation_id": organisation_id}
 
-    response = await async_client.post("/organisation/api/recycle/", json=data)
+    response = await async_client.post("/api/recycle/", json=data)
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert response.json()["detail"] == f"Организация с идентификатором {organisation_id} не найдена"
@@ -60,7 +60,7 @@ async def test_recycle_all_waste(mock_update_storage: AsyncMock,
 
     data = {"organisation_id": organisation.id}
 
-    response = await async_client.post("/organisation/api/recycle/", json=data)
+    response = await async_client.post("/api/recycle/", json=data)
 
     assert response.status_code == status.HTTP_200_OK
     assert response.json()['storage_plan'] == {'1': {'Пластик': 30, 'Биоотходы': 20},
@@ -96,9 +96,9 @@ async def test_recycle_all_waste_already_processed(mock_update_storage: AsyncMoc
 
     data = {"organisation_id": organisation.id}
 
-    await async_client.post("/organisation/api/recycle/", json=data)
+    await async_client.post("/api/recycle/", json=data)
     assert mock_update_storage.call_count == 1
-    response = await async_client.post("/organisation/api/recycle/", json=data)
+    response = await async_client.post("/api/recycle/", json=data)
 
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["message"] == "Все отходы уже были успешно переработаны"
@@ -129,7 +129,7 @@ async def test_recycle_no_storage_available(mock_update_storage: AsyncMock,
     await create_distance(db_session, storage1.id, organisation.id, distance=10)
 
     data = {"organisation_id": organisation.id}
-    response = await async_client.post("/organisation/api/recycle/", json=data)
+    response = await async_client.post("/api/recycle/", json=data)
 
     mock_update_storage.assert_not_called()
     assert response.status_code == status.HTTP_404_NOT_FOUND

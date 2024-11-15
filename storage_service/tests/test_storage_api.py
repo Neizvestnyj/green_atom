@@ -26,7 +26,7 @@ async def test_create_storage(mock_send_event: AsyncMock, async_client: AsyncCli
             "Биоотходы": [0, 50]
         }
     }
-    response = await async_client.post("/storage/api/storages/", json=data)
+    response = await async_client.post("/api/storages/", json=data)
 
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["name"] == data["name"]
@@ -42,7 +42,7 @@ async def test_get_storages(async_client: AsyncClient) -> None:
     :return: None
     """
 
-    response = await async_client.get("/storage/api/storages/")
+    response = await async_client.get("/api/storages/")
 
     assert response.status_code == status.HTTP_200_OK
     assert isinstance(response.json(), list)
