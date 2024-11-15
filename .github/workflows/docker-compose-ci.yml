@@ -38,20 +38,20 @@ jobs:
           timeout=15
           elapsed=0
           while ! curl --silent --fail http://localhost && [ $elapsed -lt $timeout ]; do
-            echo "Waiting for organization_service to be ready..."
+            echo "Waiting for services to be ready..."
             sleep 5
             elapsed=$((elapsed + 5))
           done
           if [ $elapsed -ge $timeout ]; then
-            echo "organization_service did not become ready in time!"
+            echo "services did not become ready in time!"
             exit 1
           fi
-          echo "organization_service is ready!"
+          echo "services is ready!"
 
       - name: Run simple curl tests
         run: |
-          curl --fail http://localhost/api/orgnanisation/health/
-          curl --fail http://localhost/api/storage/health/
+          curl --fail http://localhost/api/v1/orgnanisation/health/
+          curl --fail http://localhost/api/v1/storage/health/
 
       - name: Shut down Docker Compose
         run: |
