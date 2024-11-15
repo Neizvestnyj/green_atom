@@ -23,7 +23,7 @@ from .database import get_db
 router = APIRouter()
 
 
-@router.get("/health")
+@router.get("/health/")
 async def health_check():
     return {"status": "OK"}
 
