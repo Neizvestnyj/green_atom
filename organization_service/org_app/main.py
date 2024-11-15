@@ -27,7 +27,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 
 app = FastAPI(lifespan=lifespan)
-app.include_router(organisations_router, prefix="/api", tags=["organisations"])
+app.include_router(organisations_router, prefix="/organisation/api", tags=["organisations"])
 
 if __name__ == "__main__":
     import uvicorn
