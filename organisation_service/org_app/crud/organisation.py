@@ -1,5 +1,6 @@
-from typing import Sequence
+from typing import Sequence, Union
 
+from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.attributes import flag_modified
@@ -16,6 +17,14 @@ async def create_organisation(db: AsyncSession, org: OrganisationCreateSchema) -
     :param org: данные для создания организации
     :return: созданная организация
     """
+
+    # Проверяем, существует ли организация с таким именем
+    existing_org = await db.execute(select(Organisation).where(Organisation.name == org.name))
+    if existing_org.scalars().first():
+        raise HTTPException(
+            status_code=400,
+            detail=f"Организация с именем {org.name} уже существует",
+        )
 
     db_org = Organisation(name=org.name, capacity=org.capacity)
     db.add(db_org)
@@ -52,7 +61,8 @@ async def get_organisation(db: AsyncSession, organisation_id: int) -> Organisati
     return result.scalar_one_or_none()
 
 
-async def update_organisation_capacity(db: AsyncSession, organisation_id: int, waste_data: dict) -> Organisation:
+async def update_organisation_capacity(db: AsyncSession, organisation_id: int, waste_data: dict) -> Union[
+    Organisation, None]:
     """
     Обновляем информацию об организации
 
@@ -77,6 +87,8 @@ async def update_organisation_capacity(db: AsyncSession, organisation_id: int, w
         await db.commit()
 
         return organisation
+    else:
+        return None
 
 
 async def delete_all_organisations(db: AsyncSession) -> Sequence[Organisation]:

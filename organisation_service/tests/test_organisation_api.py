@@ -37,6 +37,65 @@ async def test_create_organisation(mock_send_event: AsyncMock, async_client: Asy
 
 
 @pytest.mark.asyncio
+async def test_create_already_exist_organisation(async_client: AsyncClient, db_session: AsyncSession) -> None:
+    """
+    Функция тестирует создание новой организации с заданными параметрами и проверяет,
+    что событие о создании организации было отправлено.
+
+    :param async_client: Асинхронный клиент для выполнения HTTP-запросов.
+    :param db_session: Сессия базы данных для создания организации в тестах.
+    :return: None
+    """
+
+    data = {
+        "name": "Test organisation",
+        "capacity": {
+            "Пластик": [0, 60],
+        }
+    }
+    await create_organisation(db_session,
+                              name=data['name'],
+                              capacity=data['capacity'],
+                              )
+    response = await async_client.post("/api/v1/organisation/organisations/", json=data)
+    resp_data = response.json()
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert resp_data["detail"] == f'Организация с именем {data["name"]} уже существует'
+
+
+@pytest.mark.asyncio
+async def test_creat_organisation_without_name(async_client: AsyncClient) -> None:
+    """
+    Функция тестирует создание новой организации с заданными параметрами и проверяет,
+    что событие о создании организации было отправлено.
+
+    :param async_client: Асинхронный клиент для выполнения HTTP-запросов.
+    :return: None
+    """
+
+    data = {
+        "capacity": {
+            "Пластик": [0, 60],
+        }
+    }
+    response = await async_client.post("/api/v1/organisation/organisations/", json=data)
+    resp_data = response.json()
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    missing_name_error = next(
+        (
+            error
+            for error in resp_data["detail"]
+            if error["type"] == "missing" and "name" in error["loc"]
+        ),
+        None,
+    )
+    assert missing_name_error is not None
+    assert missing_name_error["msg"] == "Field required"
+
+
+@pytest.mark.asyncio
 async def test_get_organisations(async_client: AsyncClient, db_session: AsyncSession) -> None:
     """
     Функция проверяет правильность работы эндпоинта для получения списка всех организаций.
