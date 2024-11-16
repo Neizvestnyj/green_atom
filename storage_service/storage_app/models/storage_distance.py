@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, ForeignKey
+from sqlalchemy import Column, Integer, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from . import Base
@@ -22,6 +22,11 @@ class StorageDistance(Base):
     storage_id = Column(Integer, ForeignKey("storages.id"))
     organisation_id = Column(Integer, ForeignKey("organisations_copy.id"))
     distance = Column(Integer, nullable=False)
+
+    # Уникальное ограничение
+    __table_args__ = (
+        UniqueConstraint('storage_id', 'organisation_id', 'distance', name='uq_storage_organisation_distance'),
+    )
 
     # Определение связей с другими таблицами
     storage = relationship("Storage", back_populates="storage_distances")
