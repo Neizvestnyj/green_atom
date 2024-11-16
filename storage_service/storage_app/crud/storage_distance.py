@@ -1,8 +1,11 @@
 from typing import Sequence
 
+from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
+from storage_app.models.organisation import OrganisationCopy
+from storage_app.models.storage import Storage
 from storage_app.models.storage_distance import StorageDistance
 from storage_app.schemas.storage_distance import StorageDistanceBaseSchema
 
@@ -17,6 +20,30 @@ async def create_storage_distance(db: AsyncSession, distance: StorageDistanceBas
 
     Создает запись о расстоянии и возвращает её.
     """
+
+    existing_distance = await db.execute(
+        select(StorageDistance).where(
+            StorageDistance.storage_id == distance.storage_id,
+            StorageDistance.organisation_id == distance.organisation_id,
+            StorageDistance.distance == distance.distance
+        )
+    )
+    if existing_distance.scalar():
+        raise HTTPException(
+            status_code=400,
+            detail="Такая запись уже существует"
+        )
+
+    # Проверка существования storage_id
+    storage_exists = await db.execute(select(Storage.id).where(Storage.id == distance.storage_id))
+    if not storage_exists.scalar():
+        raise HTTPException(status_code=400, detail="Указанного хранилища не существует")
+
+    # Проверка существования organisation_id
+    organisation_exists = await db.execute(
+        select(OrganisationCopy.id).where(OrganisationCopy.id == distance.organisation_id))
+    if not organisation_exists.scalar():
+        raise HTTPException(status_code=400, detail="Указанной организации не существует")
 
     db_distance = StorageDistance(
         storage_id=distance.storage_id,
