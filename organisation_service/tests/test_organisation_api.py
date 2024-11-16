@@ -39,8 +39,7 @@ async def test_create_organisation(mock_send_event: AsyncMock, async_client: Asy
 @pytest.mark.asyncio
 async def test_create_already_exist_organisation(async_client: AsyncClient, db_session: AsyncSession) -> None:
     """
-    Функция тестирует создание новой организации с заданными параметрами и проверяет,
-    что событие о создании организации было отправлено.
+    Проверяем, что организация с указанным именем существует
 
     :param async_client: Асинхронный клиент для выполнения HTTP-запросов.
     :param db_session: Сессия базы данных для создания организации в тестах.
@@ -67,8 +66,7 @@ async def test_create_already_exist_organisation(async_client: AsyncClient, db_s
 @pytest.mark.asyncio
 async def test_creat_organisation_without_name(async_client: AsyncClient) -> None:
     """
-    Функция тестирует создание новой организации с заданными параметрами и проверяет,
-    что событие о создании организации было отправлено.
+    Функция тестирует создание новой организации без имени.
 
     :param async_client: Асинхронный клиент для выполнения HTTP-запросов.
     :return: None

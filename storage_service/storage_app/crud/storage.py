@@ -1,6 +1,7 @@
 from typing import Sequence
 from typing import Union
 
+from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm.attributes import flag_modified
@@ -19,6 +20,14 @@ async def create_storage(db: AsyncSession, storage: StorageCreateSchema) -> Stor
 
     Создает новое хранилище в базе данных и возвращает созданную запись.
     """
+
+    # Проверяем, существует ли хранилище с таким именем
+    existing_storage = await db.execute(select(Storage).where(Storage.name == storage.name))
+    if existing_storage.scalars().first():
+        raise HTTPException(
+            status_code=400,
+            detail=f"Хранилище с именем {storage.name} уже существует",
+        )
 
     db_storage = Storage(name=storage.name, location=storage.location, capacity=storage.capacity)
     db.add(db_storage)
