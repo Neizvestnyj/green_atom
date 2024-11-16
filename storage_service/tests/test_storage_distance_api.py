@@ -109,7 +109,7 @@ async def test_creat_storage_distance_without_organisation(async_client: AsyncCl
                                    capacity={"Пластик": [0, 60]},
                                    )
 
-    data = {"storage_id": storage, "organisation_id": 1, "distance": 100}
+    data = {"storage_id": storage.id, "organisation_id": 1, "distance": 100}
 
     response = await async_client.post("/api/v1/storage/storage_distances/", json=data)
     resp_data = response.json()
