@@ -5,7 +5,7 @@ import pika
 from pika.channel import Channel
 from pika.spec import Basic, BasicProperties
 
-from org_app.crud.storage_distance import create_storage_distance_copy
+from org_app.crud.storage_distance import create_storage_distance_copy, delete_distance
 from org_app.database import AsyncSessionLocal
 from org_app.events import RABBITMQ_HOST
 from org_app.schemas.storage_distance import StorageDistanceCopySchema
@@ -58,4 +58,39 @@ def listen_storage_distance_created_event() -> None:
         asyncio.run(handle_event())
 
     channel.basic_consume(queue="storage_distance_created", on_message_callback=callback, auto_ack=True)
+    channel.start_consuming()
+
+
+def listen_distance_deleted_event() -> None:
+    """
+    Слушатель события удаления расстояния. Удаляет расстояние по полученному id.
+
+    :return: None
+    """
+
+    connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_HOST))
+    channel = connection.channel()
+    channel.queue_declare(queue="distance_delete")
+
+    def callback(ch: Channel, method: Basic.Deliver, properties: BasicProperties, body: bytes) -> None:
+        """
+        Обработчик сообщений из очереди, который удаляет организации по id.
+
+        :param ch: Канал RabbitMQ
+        :param method: Метаданные о сообщении
+        :param properties: Свойства сообщения
+        :param body: Тело сообщения, содержащее список id организаций для удаления
+        :return: None
+        """
+
+        message = json.loads(body)
+        distance_id = message["id"]
+
+        async def handle_event():
+            async with AsyncSessionLocal() as db:
+                await delete_distance(db, distance_id)
+
+        asyncio.run(handle_event())
+
+    channel.basic_consume(queue="distance_delete", on_message_callback=callback, auto_ack=True)
     channel.start_consuming()

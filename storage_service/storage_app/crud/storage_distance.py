@@ -1,4 +1,4 @@
-from typing import Sequence
+from typing import Sequence, Union
 
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -56,6 +56,28 @@ async def create_storage_distance(db: AsyncSession, distance: StorageDistanceBas
     await db.refresh(db_distance)
 
     return db_distance
+
+
+async def delete_distance(db: AsyncSession, distance_id: int) -> Union[StorageDistance, None]:
+    """
+    Удаление `StorageDistance`.
+
+    :param db: асинхронная сессия базы данных
+    :param distance_id: Идентификатор хранилища
+    :return: список удаленных организаций
+    """
+
+    # Получаем все организации
+    result = await db.execute(select(StorageDistance).filter_by(id=distance_id))
+    distance = result.scalars().first()
+
+    if not distance:
+        return None
+
+    await db.delete(distance)
+    await db.commit()
+
+    return distance
 
 
 async def get_all_storage_distances(db: AsyncSession) -> Sequence[StorageDistance]:

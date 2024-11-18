@@ -1,3 +1,6 @@
+from typing import Union
+
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from org_app.models.storage_distance import StorageDistanceCopy
@@ -28,3 +31,24 @@ async def create_storage_distance_copy(
     await db.refresh(db_storage_distance_copy)
 
     return db_storage_distance_copy
+
+
+async def delete_distance(db: AsyncSession, distance_id: int) -> Union[StorageDistanceCopy, None]:
+    """
+    Удаление `StorageDistance`.
+
+    :param db: асинхронная сессия базы данных
+    :param distance_id: Идентификатор хранилища
+    :return: список удаленных организаций
+    """
+
+    result = await db.execute(select(StorageDistanceCopy).filter_by(id=distance_id))
+    distance = result.scalars().first()
+
+    if not distance:
+        return None
+
+    await db.delete(distance)
+    await db.commit()
+
+    return distance

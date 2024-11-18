@@ -10,9 +10,11 @@ from storage_app.crud.storage import (create_storage as crud_create_storage,
                                       )
 from storage_app.crud.storage_distance import (get_all_storage_distances as crud_get_all_storage_distances,
                                                create_storage_distance as crud_create_storage_distance,
+                                               delete_distance as crud_delete_distance,
                                                )
 from storage_app.events.producers.storage import send_storage_created_event, send_storage_deleted_event
-from storage_app.events.producers.storage_distance import send_storage_distance_created_event
+from storage_app.events.producers.storage_distance import send_storage_distance_created_event, \
+    send_distance_deleted_event
 from storage_app.models.storage import Storage
 from storage_app.models.storage_distance import StorageDistance
 from storage_app.schemas.storage import StorageSchema, StorageCreateSchema
@@ -117,3 +119,23 @@ async def delete_organisation(storage_id: int, db: AsyncSession = Depends(get_db
     send_storage_deleted_event(storage)
 
     return JSONResponse(content={"message": "Хранилище успешно удалено"}, status_code=200)
+
+
+@router.delete("/distance/{distance_id}/")
+async def delete_organisation(distance_id: int, db: AsyncSession = Depends(get_db)) -> JSONResponse:
+    """
+    Удаление всех организаций.
+
+    :param distance_id: ID `StorageDistance`
+    :param db: сессия базы данных
+    :return: список удаленных организаций
+    :raises HTTPException: если организации для удаления не найдены
+    """
+
+    distance = await crud_delete_distance(db, distance_id)
+    if not distance:
+        raise HTTPException(status_code=404, detail="Не найдено расстояние между МНО и ОО для удаления")
+
+    send_distance_deleted_event(distance)
+
+    return JSONResponse(content={"message": "Расстояние между ОО и МНО успешно удалено"}, status_code=200)

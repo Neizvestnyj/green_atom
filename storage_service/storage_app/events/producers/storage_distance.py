@@ -27,3 +27,23 @@ def send_storage_distance_created_event(storage_distance: StorageDistance) -> No
     channel.basic_publish(exchange="", routing_key="storage_distance_created", body=message)
 
     connection.close()
+
+def send_distance_deleted_event(sotrage_distance: StorageDistance) -> None:
+    """
+    Отправка события об удалении расстояния.
+
+    :param sotrage_distance: Объект расстояния, для которого отправляется событие
+    :return: None
+    """
+
+    connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_HOST))
+    channel = connection.channel()
+
+    channel.queue_declare(queue="distance_delete")
+    message = json.dumps({"id": sotrage_distance.id})
+    channel.basic_publish(exchange="",
+                          routing_key="distance_delete",
+                          body=message,
+                          )
+
+    connection.close()

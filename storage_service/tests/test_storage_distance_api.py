@@ -150,3 +150,51 @@ async def test_get_storage_distances(async_client: AsyncClient) -> None:
     response = await async_client.get("/api/v1/storage/distances/")
     assert response.status_code == status.HTTP_200_OK
     assert isinstance(response.json(), list)
+
+
+@pytest.mark.asyncio
+async def test_delete_empty_distance(async_client: AsyncClient) -> None:
+    """
+    Функция проверяет, что если нет расстояния, возвращается ошибка.
+
+    :param async_client: Асинхронный клиент для выполнения HTTP-запросов.
+    :return: None
+    """
+
+    response = await async_client.delete(f"/api/v1/storage/distance/1/")
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    response_json = response.json()
+    assert response_json["detail"] == "Не найдено расстояние между МНО и ОО для удаления"
+
+
+@pytest.mark.asyncio
+@patch("storage_app.api.send_distance_deleted_event", autospec=True)
+async def test_delete_distance(mock_send_event: AsyncMock,
+                               async_client: AsyncClient,
+                               db_session: AsyncSession,
+                               ) -> None:
+    """
+    Проверяем успешное удаление расстояния
+
+    :param mock_send_event: Мок-функция для отправки события об удалении всех организаций.
+    :param async_client: Асинхронный клиент для выполнения HTTP-запросов.
+    :param db_session: Сессия базы данных для создания организации в тестах.
+    :return: None
+    """
+
+    organisation = await create_organisation(db_session)
+    storage = await create_storage(db_session,
+                                   name='Тест МНО',
+                                   location='Тверь',
+                                   capacity={"Пластик": [0, 60],
+                                             }
+                                   )
+
+    data = {"storage_id": storage.id, "organisation_id": organisation.id, "distance": 100}
+    distance = await create_distance(db_session, **data)
+    response = await async_client.delete(f"/api/v1/storage/distance/{distance.id}/")
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()["message"] == "Расстояние между ОО и МНО успешно удалено"
+    mock_send_event.assert_called_once()
