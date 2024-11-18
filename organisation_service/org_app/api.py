@@ -100,7 +100,7 @@ async def recycle(
         raise HTTPException(status_code=404, detail=f"Организация с идентификатором {org_id} не найдена")
 
     if organisation.is_all_waste_processed():
-        return RecycleResponseSchema(storage_plan={}, message="Все отходы уже были успешно переработаны")
+        return RecycleResponseSchema(waste_distribution={}, message="Все отходы уже были успешно переработаны")
 
     # Находим ближайшие доступные хранилища и определяем, куда можно поместить отходы
     storage_plan, total_sent_waste, remaining_waste = await find_nearest_storage(db, org_id)
@@ -117,10 +117,10 @@ async def recycle(
 
     if remaining_waste:
         return RecycleResponseSchema(
-            storage_plan=storage_plan,
+            waste_distribution=storage_plan,
             message=f"Отходы частично распределены. Не удалось отправить: {remaining_waste} из-за ограничений"
         )
     else:
-        return RecycleResponseSchema(storage_plan=storage_plan,
+        return RecycleResponseSchema(waste_distribution=storage_plan,
                                      message="Отходы были распределены по хранилищам"
                                      )

@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r organisation_service/requirements.txt -r storage_service/requirements.txt -r organisation_service/requirements.test.txt -r storage_service/requirements.test.txt
+          pip install -r organisation_service/requirements/requirements.txt -r storage_service/requirements/requirements.txt -r organisation_service/requirements/requirements.test.txt -r storage_service/requirements/requirements.test.txt
 
       - name: Run organisation_service tests with coverage
         run: |

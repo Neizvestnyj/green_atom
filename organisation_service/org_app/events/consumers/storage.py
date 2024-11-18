@@ -52,6 +52,7 @@ def listen_storage_created_event() -> None:
     channel.basic_consume(queue="storage_created", on_message_callback=callback, auto_ack=True)
     channel.start_consuming()
 
+
 def listen_storage_deleted_event() -> None:
     """
     Слушатель события удаления хранилища. Удаляет хранилище по полученному id.

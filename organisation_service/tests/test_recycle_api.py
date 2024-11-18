@@ -63,9 +63,9 @@ async def test_recycle_all_waste(mock_update_storage: AsyncMock,
     response = await async_client.post("/api/v1/organisation/recycle/", json=data)
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.json()['storage_plan'] == {'1': {'Пластик': 30, 'Биоотходы': 20},
-                                               '2': {'Пластик': 20, 'Стекло': 40},
-                                               }
+    assert response.json()['waste_distribution'] == {'1': {'Пластик': 30, 'Биоотходы': 20},
+                                                     '2': {'Пластик': 20, 'Стекло': 40},
+                                                     }
     assert response.json()["message"] == "Отходы были распределены по хранилищам"
     assert mock_update_storage.call_count == 2
 
@@ -166,5 +166,6 @@ async def test_recycle_partial_delivery(mock_update_storage: AsyncMock,
     resp_data = response.json()
 
     assert response.status_code == status.HTTP_200_OK
-    assert resp_data["message"] == "Отходы частично распределены. Не удалось отправить: {'Пластик': 30, 'Биоотходы': 40} из-за ограничений"
+    assert resp_data[
+               "message"] == "Отходы частично распределены. Не удалось отправить: {'Пластик': 30, 'Биоотходы': 40} из-за ограничений"
     assert mock_update_storage.call_count == 1

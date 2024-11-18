@@ -17,11 +17,11 @@ class RecycleResponseSchema(BaseModel):
     """
     Модель ответа на запрос утилизации, содержащая план утилизации по хранилищам.
 
-    :param storage_plan: Словарь, содержащий ID хранилища и объемы отходов, которые
-                         можно туда передать.
+    :param waste_distribution: Словарь, содержащий ID хранилища и объемы отходов, которые
+                         были туда переданы.
                          Пример: {1: {"Стекло": 50, "Биоотходы": 100}, 2: {"Стекло": 50}}
     :param message: Сообщение о статусе переработки
     """
 
-    storage_plan: Dict[int, Dict[str, int]]
+    waste_distribution: Dict[int, Dict[str, int]]
     message: str

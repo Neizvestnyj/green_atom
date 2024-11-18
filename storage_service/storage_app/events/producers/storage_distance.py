@@ -28,6 +28,7 @@ def send_storage_distance_created_event(storage_distance: StorageDistance) -> No
 
     connection.close()
 
+
 def send_distance_deleted_event(sotrage_distance: StorageDistance) -> None:
     """
     Отправка события об удалении расстояния.

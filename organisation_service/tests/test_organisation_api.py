@@ -148,11 +148,11 @@ async def test_delete_all_organisations(mock_send_event: AsyncMock,
     """
 
     org = await create_organisation(db_session,
-                              name="New Test Organisation",
-                              capacity={
-                                  "Пластик": [0, 50],
-                              },
-                              )
+                                    name="New Test Organisation",
+                                    capacity={
+                                        "Пластик": [0, 50],
+                                    },
+                                    )
     response = await async_client.delete(f"/api/v1/organisation/organisation/{org.id}/")
 
     assert response.status_code == status.HTTP_200_OK
