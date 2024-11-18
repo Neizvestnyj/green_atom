@@ -49,7 +49,7 @@ def listen_organisation_created_event() -> None:
 
 def listen_organisation_deleted_event() -> None:
     """
-    Слушатель события удаления организации. Удаляет организации по полученному списку id.
+    Слушатель события удаления организации. Удаляет организации по полученному id.
 
     :return: None
     """
