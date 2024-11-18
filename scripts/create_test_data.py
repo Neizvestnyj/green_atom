@@ -1,46 +1,97 @@
 import asyncio
+from typing import Any, Dict, List, Tuple
 
 import httpx
 
-ORGANISATION_URL = "http://localhost:8000/api"
-STORAGE_URL = "http://localhost:8001/api"
+ORGANISATION_URL = "http://localhost:8000/api/v1/organisation"
+STORAGE_URL = "http://localhost:8001/api/v1/storage"
 
 
-# Функция для создания организации с capacity
-async def create_organisation(client, name, capacity: dict):
-    response = await client.post(f"{ORGANISATION_URL}/organisations/", json={"name": name, "capacity": capacity})
+async def create_organisation(
+        client: httpx.AsyncClient,
+        name: str,
+        capacity: Dict[str, List[int]]
+) -> Tuple[int, Dict[str, Any]]:
+    """
+    Создание организации.
+
+    :param client: HTTP-клиент для выполнения запросов
+    :param name: Название организации
+    :param capacity: Емкость организации в формате {"тип отхода": [текущая емкость, максимальная емкость]}
+    :return: Кортеж, содержащий статус-код и тело ответа
+    """
+
+    response = await client.post(
+        f"{ORGANISATION_URL}/organisations/",
+        json={"name": name, "capacity": capacity}
+    )
+
+    return response.status_code, response.json()
+
+
+async def create_storage(
+        client: httpx.AsyncClient,
+        name: str,
+        location: str,
+        capacity: Dict[str, List[int]]
+) -> Tuple[int, Dict[str, Any]]:
+    """
+    Создание склада.
+
+    :param client: HTTP-клиент для выполнения запросов
+    :param name: Название склада
+    :param location: Местоположение склада
+    :param capacity: Емкость склада в формате {"тип отхода": [текущая емкость, максимальная емкость]}
+    :return: Кортеж, содержащий статус-код и тело ответа
+    """
+
+    response = await client.post(
+        f"{STORAGE_URL}/storages/",
+        json={"name": name, "location": location, "capacity": capacity}
+    )
+
+    return response.status_code, response.json()
+
+
+async def create_storage_distance(
+        client: httpx.AsyncClient,
+        storage_id: int,
+        organisation_id: int,
+        distance: float
+) -> Dict[str, Any]:
+    """
+    Создание расстояния между складом и организацией.
+
+    :param client: HTTP-клиент для выполнения запросов
+    :param storage_id: Идентификатор склада
+    :param organisation_id: Идентификатор организации
+    :param distance: Расстояние между складом и организацией
+    :return: Ответ API в формате словаря
+    """
+
+    response = await client.post(
+        f"{STORAGE_URL}/storage_distances/",
+        json={"storage_id": storage_id, "organisation_id": organisation_id, "distance": distance}
+    )
+
     return response.json()
 
 
-# Функция для создания склада с capacity
-async def create_storage(client, name, location, capacity: dict):
-    response = await client.post(f"{STORAGE_URL}/storages/", json={
-        "name": name,
-        "location": location,
-        "capacity": capacity
-    })
-    return response.json()
+async def create_test_data() -> None:
+    """
+    Создание тестовых данных.
 
+    :raises ValueError: Если создание организаций или складов завершилось с ошибкой
+    """
 
-# Функция для создания расстояния между складами и организациями
-async def create_storage_distance(client, storage_id, organisation_id, distance):
-    response = await client.post(f"{STORAGE_URL}/storage_distances/", json={
-        "storage_id": storage_id,
-        "organisation_id": organisation_id,
-        "distance": distance
-    })
-    return response.json()
-
-
-# Функция для создания тестовых данных
-async def create_test_data():
     async with httpx.AsyncClient() as client:
-        # Создаем организации с соответствующими данными о capacity
+        # Создание организаций
         oo1_capacity = {
             "Пластик": [0, 10],
             "Стекло": [0, 50],
             "Биоотходы": [0, 50]
         }
+
         oo2_capacity = {
             "Пластик": [0, 60],
             "Стекло": [0, 20],
@@ -50,69 +101,41 @@ async def create_test_data():
         oo1 = await create_organisation(client, "ОО1", oo1_capacity)
         oo2 = await create_organisation(client, "ОО2", oo2_capacity)
 
-        # Создаем склады с соответствующими данными о capacity
-        mno1_capacity = {
-            "Стекло": [0, 300],
-            "Пластик": [0, 100]
-        }
-        mno2_capacity = {
-            "Пластик": [0, 50],
-            "Биоотходы": [0, 150]
-        }
-        mno3_capacity = {
-            "Пластик": [0, 10],
-            "Биоотходы": [0, 250]
-        }
-        mno5_capacity = {
-            "Стекло": [0, 220],
-            "Биоотходы": [0, 25]
-        }
-        mno6_capacity = {
-            "Стекло": [0, 100],
-            "Биоотходы": [0, 150]
-        }
-        mno7_capacity = {
-            "Пластик": [0, 100],
-            "Биоотходы": [0, 250]
-        }
-        mno8_capacity = {
-            "Стекло": [0, 35],
-            "Пластик": [0, 25],
-            "Биоотходы": [0, 52]
-        }
-        mno9_capacity = {
-            "Пластик": [0, 250],
-            "Биоотходы": [0, 20]
+        if oo1[0] != 200 or oo2[0] != 200:
+            raise ValueError('Организации не были созданы')
+
+        # Создание складов
+        storage_capacities = {
+            "МНО1": {"location": "Москва", "capacity": {"Стекло": [0, 300], "Пластик": [0, 100]}},
+            "МНО2": {"location": "Москва", "capacity": {"Пластик": [0, 50], "Биоотходы": [0, 150]}},
+            "МНО3": {"location": "Москва", "capacity": {"Пластик": [0, 10], "Биоотходы": [0, 250]}},
+            "МНО5": {"location": "Москва", "capacity": {"Стекло": [0, 220], "Биоотходы": [0, 25]}},
+            "МНО6": {"location": "Москва", "capacity": {"Стекло": [0, 100], "Биоотходы": [0, 150]}},
+            "МНО7": {"location": "Москва", "capacity": {"Пластик": [0, 100], "Биоотходы": [0, 250]}},
+            "МНО8": {"location": "Москва", "capacity": {"Стекло": [0, 35], "Пластик": [0, 25], "Биоотходы": [0, 52]}},
+            "МНО9": {"location": "Москва", "capacity": {"Пластик": [0, 250], "Биоотходы": [0, 20]}},
         }
 
-        mno1 = await create_storage(client, "МНО1", "Москва", mno1_capacity)
-        mno2 = await create_storage(client, "МНО2", "Москва", mno2_capacity)
-        mno3 = await create_storage(client, "МНО3", "Москва", mno3_capacity)
-        mno5 = await create_storage(client, "МНО5", "Москва", mno5_capacity)
-        mno6 = await create_storage(client, "МНО6", "Москва", mno6_capacity)
-        mno7 = await create_storage(client, "МНО7", "Москва", mno7_capacity)
-        mno8 = await create_storage(client, "МНО8", "Москва", mno8_capacity)
-        mno9 = await create_storage(client, "МНО9", "Москва", mno9_capacity)
+        storages = {}
+        for name, details in storage_capacities.items():
+            response = await create_storage(client, name, details["location"], details["capacity"])
+            if response[0] != 200:
+                raise ValueError(f'Хранилище {name} не было создано')
+            storages[name] = response[1]
 
-        # Создаем расстояния между складами и организациями
-        # ОО1
-        await create_storage_distance(client, mno1["id"], oo1["id"], 100)
-        await create_storage_distance(client, mno2["id"], oo1["id"], 50)
-        await create_storage_distance(client, mno3["id"], oo1["id"], 600)
-
-        await create_storage_distance(client, mno5["id"], oo1["id"], 100)
-        await create_storage_distance(client, mno6["id"], oo1["id"], 1200)
-        await create_storage_distance(client, mno7["id"], oo1["id"], 650)
-        await create_storage_distance(client, mno8["id"], oo1["id"], 600)
-        await create_storage_distance(client, mno9["id"], oo1["id"], 610)
-
-        # ОО2
-        await create_storage_distance(client, mno3["id"], oo2["id"], 50)
-        await create_storage_distance(client, mno6["id"], oo2["id"], 650)
-        await create_storage_distance(client, mno7["id"], oo2["id"], 100)
-
-        # Двусторонние связи
+        # Создание расстояний
+        await create_storage_distance(client, storages["МНО1"]["id"], oo1[1]["id"], 100)
+        await create_storage_distance(client, storages["МНО2"]["id"], oo1[1]["id"], 50)
+        await create_storage_distance(client, storages["МНО3"]["id"], oo1[1]["id"], 600)
+        await create_storage_distance(client, storages["МНО5"]["id"], oo1[1]["id"], 100)
+        await create_storage_distance(client, storages["МНО6"]["id"], oo1[1]["id"], 1200)
+        await create_storage_distance(client, storages["МНО7"]["id"], oo1[1]["id"], 650)
+        await create_storage_distance(client, storages["МНО8"]["id"], oo1[1]["id"], 600)
+        await create_storage_distance(client, storages["МНО9"]["id"], oo1[1]["id"], 610)
+        await create_storage_distance(client, storages["МНО3"]["id"], oo2[1]["id"], 50)
+        await create_storage_distance(client, storages["МНО6"]["id"], oo2[1]["id"], 650)
+        await create_storage_distance(client, storages["МНО7"]["id"], oo2[1]["id"], 100)
 
 
-# Запускаем асинхронный скрипт для создания тестовых данных
-asyncio.run(create_test_data())
+if __name__ == "__main__":
+    asyncio.run(create_test_data())
