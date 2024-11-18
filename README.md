@@ -1,5 +1,12 @@
 # Green Atom [![codecov](https://codecov.io/gh/Neizvestnyj/green_atom/branch/master/graph/badge.svg?token=RZJYZXF5WD)](https://codecov.io/gh/Neizvestnyj/green_atom)
 
+## Схемы
+### Схема БД
+![Схема БД](diagrams/db.png)
+
+### Схема архитектуры
+![Схема EDA](diagrams/EDA.png)
+
 ## Деплой
 
 ```shell
