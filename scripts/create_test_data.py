@@ -3,8 +3,8 @@ from typing import Any, Dict, List, Tuple
 
 import httpx
 
-ORGANISATION_URL = "http://localhost:8000/api/v1/organisation"  # :8000
-STORAGE_URL = "http://localhost:8001/api/v1/storage"  # :8001
+ORGANISATION_URL = "http://localhost/api/v1/organisation"  # :8000
+STORAGE_URL = "http://localhost/api/v1/storage"  # :8001
 
 
 async def create_organisation(
