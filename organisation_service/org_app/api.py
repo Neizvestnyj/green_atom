@@ -2,6 +2,7 @@ from typing import Sequence
 
 from fastapi import APIRouter, Depends
 from fastapi import HTTPException
+from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from org_app.crud.organisation import (create_organisation as crud_create_organisation,
@@ -59,8 +60,8 @@ async def get_organisations(db: AsyncSession = Depends(get_db)) -> Sequence[Orga
     return await crud_get_all_organisations(db)
 
 
-@router.delete("/organisations/", response_model=list[OrganisationSchema])
-async def delete_all_organisations(db: AsyncSession = Depends(get_db)) -> Sequence[Organisation]:
+@router.delete("/organisations/")
+async def delete_all_organisations(db: AsyncSession = Depends(get_db)) -> JSONResponse:
     """
     Удаление всех организаций.
 
@@ -75,7 +76,7 @@ async def delete_all_organisations(db: AsyncSession = Depends(get_db)) -> Sequen
 
     send_organisations_delete_event(organisations)
 
-    return organisations
+    return JSONResponse(content={"message": "Все организации успешно удалены"}, status_code=200)
 
 
 @router.post("/recycle/", response_model=RecycleResponseSchema)

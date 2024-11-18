@@ -156,4 +156,5 @@ async def test_delete_all_organisations(mock_send_event: AsyncMock,
     response = await async_client.delete("/api/v1/organisation/organisations/")
 
     assert response.status_code == status.HTTP_200_OK
+    assert response.json()["message"] == "Все организации успешно удалены"
     mock_send_event.assert_called_once()
