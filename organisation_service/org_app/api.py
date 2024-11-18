@@ -29,7 +29,7 @@ async def health_check():
     return {"status": "OK"}
 
 
-@router.post("/create/", response_model=OrganisationSchema)
+@router.post("/organisation/", response_model=OrganisationSchema)
 async def create_organisation(
         org: OrganisationCreateSchema,
         db: AsyncSession = Depends(get_db),
@@ -48,7 +48,7 @@ async def create_organisation(
     return organisation
 
 
-@router.get("/list/", response_model=list[OrganisationSchema])
+@router.get("/organisations/", response_model=list[OrganisationSchema])
 async def get_organisations(db: AsyncSession = Depends(get_db)) -> Sequence[Organisation]:
     """
     Получение списка всех организаций.

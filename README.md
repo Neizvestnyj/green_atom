@@ -21,7 +21,7 @@ docker-compose up -d
 ```
 
 #### 2. Создание организации  
-**POST** `/api/v1/organisation/create/`  
+**POST** `/api/v1/organisation/organisation/`  
 - Создает новую организацию.  
 
 **Параметры:**  
@@ -54,7 +54,7 @@ docker-compose up -d
 ```
 
 #### 3. Получение списка организаций  
-**GET** `/api/v1/organisation/list/`  
+**GET** `/api/v1/organisation/organisations/`  
 - Возвращает список всех организаций.  
 
 **Пример ответа:**  

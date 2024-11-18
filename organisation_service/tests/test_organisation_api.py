@@ -27,7 +27,7 @@ async def test_create_organisation(mock_send_event: AsyncMock, async_client: Asy
             "Биоотходы": [0, 50]
         }
     }
-    response = await async_client.post("/api/v1/organisation/create/", json=data)
+    response = await async_client.post("/api/v1/organisation/organisation/", json=data)
     resp_data = response.json()
 
     assert response.status_code == status.HTTP_200_OK
@@ -56,7 +56,7 @@ async def test_create_already_exist_organisation(async_client: AsyncClient, db_s
                               name=data['name'],
                               capacity=data['capacity'],
                               )
-    response = await async_client.post("/api/v1/organisation/create/", json=data)
+    response = await async_client.post("/api/v1/organisation/organisation/", json=data)
     resp_data = response.json()
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -77,7 +77,7 @@ async def test_creat_organisation_without_name(async_client: AsyncClient) -> Non
             "Пластик": [0, 60],
         }
     }
-    response = await async_client.post("/api/v1/organisation/create/", json=data)
+    response = await async_client.post("/api/v1/organisation/organisation/", json=data)
     resp_data = response.json()
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
@@ -110,7 +110,7 @@ async def test_get_organisations(async_client: AsyncClient, db_session: AsyncSes
                               },
                               )
 
-    response = await async_client.get("/api/v1/organisation/list/")
+    response = await async_client.get("/api/v1/organisation/organisations/")
 
     assert response.status_code == status.HTTP_200_OK
     assert isinstance(response.json(), list)
