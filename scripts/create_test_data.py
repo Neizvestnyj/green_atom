@@ -3,8 +3,8 @@ from typing import Any, Dict, List, Tuple
 
 import httpx
 
-ORGANISATION_URL = "http://localhost:8000/api/v1/organisation"
-STORAGE_URL = "http://localhost:8001/api/v1/storage"
+ORGANISATION_URL = "http://localhost/api/v1/organisation"  # :8000
+STORAGE_URL = "http://localhost/api/v1/storage"  # :8001
 
 
 async def create_organisation(
@@ -22,7 +22,7 @@ async def create_organisation(
     """
 
     response = await client.post(
-        f"{ORGANISATION_URL}/create/",
+        f"{ORGANISATION_URL}/organisation/",
         json={"name": name, "capacity": capacity}
     )
 
@@ -46,7 +46,7 @@ async def create_storage(
     """
 
     response = await client.post(
-        f"{STORAGE_URL}/storages/",
+        f"{STORAGE_URL}/storage/",
         json={"name": name, "location": location, "capacity": capacity}
     )
 
@@ -70,7 +70,7 @@ async def create_storage_distance(
     """
 
     response = await client.post(
-        f"{STORAGE_URL}/storage_distances/",
+        f"{STORAGE_URL}/distance/",
         json={"storage_id": storage_id, "organisation_id": organisation_id, "distance": distance}
     )
 

@@ -2,9 +2,10 @@ FROM python:3.11
 
 WORKDIR /app
 
-COPY . .
+COPY ./requirements ./requirements
+RUN pip install -r requirements/requirements.txt -r requirements/requirements.test.txt
 
-RUN pip install -r requirements.txt
+COPY . .
 
 EXPOSE 8001
 

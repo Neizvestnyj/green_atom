@@ -1,0 +1,5 @@
+pytest
+pytest_asyncio
+httpx
+coverage
+gevent

@@ -7,6 +7,11 @@ docker-compose build
 docker-compose up -d
 ```
 
+## Скрипт для создания тестовых данных
+```shell
+python scripts/create_test_data.py
+```
+
 ## **API для управления организациями и хранилищами**
 
 ### **Запросы для микросервиса organisation**  
@@ -262,9 +267,9 @@ docker-compose up -d
 }
 ```
 
-## Запуск тестов
-
+## Запуск Unit-тестов
+> Note: Unit-тесты уже запускаются в процессе выполнения GitHub Workflow
 ```shell
-docker exec -it organisation_service pytest organisation_service/tests
-docker exec -it storage_service pytest storage_service/tests
+docker exec -it organisation_service pytest tests
+docker exec -it storage_service pytest tests
 ```
