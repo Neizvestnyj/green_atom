@@ -169,3 +169,30 @@ async def test_recycle_partial_delivery(mock_update_storage: AsyncMock,
     assert resp_data[
                "message"] == "Отходы частично распределены. Не удалось отправить: {'Пластик': 30, 'Биоотходы': 40} из-за ограничений"
     assert mock_update_storage.call_count == 1
+
+
+@pytest.mark.asyncio
+async def test_no_storage_connection_for_organisation(async_client: AsyncClient,
+                                                      db_session: AsyncSession,
+                                                      ) -> None:
+    """
+    Проверяем, что при попытке распределить отходы организации, у которой нет связи с хранилищами получим ошибку
+
+    :param async_client: Асинхронный клиент для выполнения HTTP-запросов.
+    :param db_session: Сессия базы данных для создания данных в тестах.
+    :return: None
+    """
+
+    organisation = await create_organisation(
+        db_session,
+        name="Test Organisation",
+        capacity={
+            "Пластик": [50, 50],
+        }
+    )
+    data = {"organisation_id": organisation.id}
+
+    response = await async_client.post("/api/v1/organisation/recycle/", json=data)
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.json()["detail"] == f"У организации нет связи с каким либо хранилищем"

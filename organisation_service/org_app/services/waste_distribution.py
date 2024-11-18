@@ -1,5 +1,6 @@
 from typing import Dict
 
+from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -33,6 +34,9 @@ async def find_nearest_storage(db: AsyncSession, organisation_id: int) -> tuple[
         select(StorageDistanceCopy).where(StorageDistanceCopy.organisation_id == organisation_id)
     )
     storage_distances = storage_distances.scalars().all()
+
+    if not storage_distances:
+        raise HTTPException(status_code=404, detail="У организации нет связи с каким либо хранилищем")
 
     for waste_type, (used, total) in organisation_capacity.items():
         remaining = used
