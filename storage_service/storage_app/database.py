@@ -1,16 +1,18 @@
 import os
 
 from sqlalchemy import event
+from sqlalchemy.dialects.sqlite.aiosqlite import AsyncAdapt_aiosqlite_connection
 from sqlalchemy.engine import Engine
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool.base import _ConnectionRecord
 
 from storage_app.models import Base
 
-# URL для подключения к базе данных SQLite
-SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///../storage_service.db")
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL",
+                                    "sqlite+aiosqlite:///../storage_service.db"
+                                    )
 
-# Создание асинхронного двигателя базы данных
 engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True)
 
 # Сессия для работы с базой данных
@@ -46,20 +48,18 @@ async def get_db() -> AsyncSession:
         yield session
 
 
-# Включение поддержки внешних ключей для SQLite
 @event.listens_for(Engine, "connect")
-def set_sqlite_pragma(dbapi_connection, connection_record) -> None:
+def set_sqlite_pragma(dbapi_connection: AsyncAdapt_aiosqlite_connection, connection_record: _ConnectionRecord) -> None:
     """
-    Включение поддержки внешних ключей в SQLite при подключении.
-
-    :param dbapi_connection: Подключение к базе данных
-    :param connection_record: Данные о подключении
+    :param dbapi_connection: подключение к базе данных
+    :param connection_record: запись подключения
     :return: None
 
-    SQLite по умолчанию не поддерживает внешние ключи, эта настройка активирует их поддержку
-    для текущего соединения.
+    Включает поддержку внешних ключей в базе данных SQLite, что важно для
+    соблюдения ограничений целостности данных.
     """
 
-    cursor = dbapi_connection.cursor()
-    cursor.execute("PRAGMA foreign_keys=ON")
-    cursor.close()
+    if isinstance(dbapi_connection, AsyncAdapt_aiosqlite_connection):
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()

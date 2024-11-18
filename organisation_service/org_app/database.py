@@ -1,16 +1,19 @@
 import os
 
 from sqlalchemy import event
+from sqlalchemy.dialects.sqlite.aiosqlite import AsyncAdapt_aiosqlite_connection
 from sqlalchemy.engine import Engine
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool.base import _ConnectionRecord
 
 from org_app.models import Base
 
 # URL подключения к базе данных
-SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///../organisation_service.db")
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL",
+                                    "sqlite+aiosqlite:///../organisation_service.db",
+                                    )
 
-# Создание асинхронного движка SQLAlchemy
 engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True)
 
 # Создание асинхронной сессии
@@ -44,12 +47,9 @@ async def get_db() -> AsyncSession:
         yield session
 
 
-# Включение поддержки внешних ключей для SQLite
 @event.listens_for(Engine, "connect")
-def set_sqlite_pragma(dbapi_connection, connection_record) -> None:
+def set_sqlite_pragma(dbapi_connection: AsyncAdapt_aiosqlite_connection, connection_record: _ConnectionRecord) -> None:
     """
-    Устанавливает флаг для поддержки внешних ключей в SQLite.
-
     :param dbapi_connection: подключение к базе данных
     :param connection_record: запись подключения
     :return: None
@@ -58,6 +58,7 @@ def set_sqlite_pragma(dbapi_connection, connection_record) -> None:
     соблюдения ограничений целостности данных.
     """
 
-    cursor = dbapi_connection.cursor()
-    cursor.execute("PRAGMA foreign_keys=ON")
-    cursor.close()
+    if isinstance(dbapi_connection, AsyncAdapt_aiosqlite_connection):
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()

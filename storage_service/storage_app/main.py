@@ -32,5 +32,4 @@ app.include_router(storage_router, prefix="/api/v1/storage", tags=["storages"])
 if __name__ == "__main__":
     import uvicorn
 
-    # Запуск приложения через uvicorn на порту 8001
     uvicorn.run('main:app', host="localhost", port=8001, reload=True, log_level='debug')

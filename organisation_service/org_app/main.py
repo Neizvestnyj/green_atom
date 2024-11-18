@@ -32,5 +32,4 @@ app.include_router(organisations_router, prefix="/api/v1/organisation", tags=["o
 if __name__ == "__main__":
     import uvicorn
 
-    # Запуск приложения через uvicorn
     uvicorn.run('main:app', host="localhost", port=8000, reload=True, log_level='debug')
