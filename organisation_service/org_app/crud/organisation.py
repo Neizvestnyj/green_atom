@@ -81,7 +81,7 @@ async def update_organisation_capacity(db: AsyncSession,
         # Обновляем capacity в организации для каждого типа отходов
         for waste_type, amount in waste_data.items():
             # Обновляем текущий объем отходов
-            organisation.capacity[waste_type][0] += amount
+            organisation.capacity[waste_type][0] -= amount
 
         flag_modified(organisation, 'capacity')
         db.add(organisation)

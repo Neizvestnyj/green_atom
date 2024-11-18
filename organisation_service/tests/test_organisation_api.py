@@ -19,12 +19,13 @@ async def test_create_organisation(mock_send_event: AsyncMock, async_client: Asy
     :param async_client: Асинхронный клиент для выполнения HTTP-запросов.
     :return: None
     """
+
     data = {
         "name": "Test organisation",
         "capacity": {
-            "Пластик": [0, 60],
-            "Стекло": [0, 20],
-            "Биоотходы": [0, 50]
+            "Пластик": [60, 60],
+            "Стекло": [20, 20],
+            "Биоотходы": [50, 50]
         }
     }
     response = await async_client.post("/api/v1/organisation/organisation/", json=data)
@@ -49,7 +50,7 @@ async def test_create_already_exist_organisation(async_client: AsyncClient, db_s
     data = {
         "name": "Test organisation",
         "capacity": {
-            "Пластик": [0, 60],
+            "Пластик": [60, 60],
         }
     }
     await create_organisation(db_session,
@@ -74,7 +75,7 @@ async def test_creat_organisation_without_name(async_client: AsyncClient) -> Non
 
     data = {
         "capacity": {
-            "Пластик": [0, 60],
+            "Пластик": [60, 60],
         }
     }
     response = await async_client.post("/api/v1/organisation/organisation/", json=data)
@@ -106,7 +107,7 @@ async def test_get_organisations(async_client: AsyncClient, db_session: AsyncSes
     await create_organisation(db_session,
                               name="New Test Organisation",
                               capacity={
-                                  "Пластик": [0, 50],
+                                  "Пластик": [50, 50],
                               },
                               )
 
@@ -150,7 +151,7 @@ async def test_delete_all_organisations(mock_send_event: AsyncMock,
     org = await create_organisation(db_session,
                                     name="New Test Organisation",
                                     capacity={
-                                        "Пластик": [0, 50],
+                                        "Пластик": [50, 50],
                                     },
                                     )
     response = await async_client.delete(f"/api/v1/organisation/organisation/{org.id}/")

@@ -3,8 +3,8 @@ from typing import Any, Dict, List, Tuple
 
 import httpx
 
-ORGANISATION_URL = "http://localhost/api/v1/organisation"  # :8000
-STORAGE_URL = "http://localhost/api/v1/storage"  # :8001
+ORGANISATION_URL = "http://localhost:8000/api/v1/organisation"  # :8000
+STORAGE_URL = "http://localhost:8001/api/v1/storage"  # :8001
 
 
 async def create_organisation(
@@ -87,15 +87,15 @@ async def create_test_data() -> None:
     async with httpx.AsyncClient() as client:
         # Создание организаций
         oo1_capacity = {
-            "Пластик": [0, 10],
-            "Стекло": [0, 50],
-            "Биоотходы": [0, 50]
+            "Пластик": [10, 10],
+            "Стекло": [50, 50],
+            "Биоотходы": [50, 50]
         }
 
         oo2_capacity = {
-            "Пластик": [0, 60],
-            "Стекло": [0, 20],
-            "Биоотходы": [0, 50]
+            "Пластик": [60, 60],
+            "Стекло": [20, 20],
+            "Биоотходы": [50, 50]
         }
 
         oo1 = await create_organisation(client, "ОО1", oo1_capacity)

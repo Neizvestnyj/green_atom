@@ -46,9 +46,9 @@ async def test_recycle_all_waste(mock_update_storage: AsyncMock,
     organisation = await create_organisation(
         db_session,
         name="Test Organisation",
-        capacity={"Пластик": [0, 50],
-                  "Стекло": [0, 40],
-                  "Биоотходы": [0, 20],
+        capacity={"Пластик": [50, 50],
+                  "Стекло": [40, 40],
+                  "Биоотходы": [20, 20],
                   }
     )
 
@@ -88,7 +88,7 @@ async def test_recycle_all_waste_already_processed(mock_update_storage: AsyncMoc
         db_session,
         name="Test Organisation",
         capacity={
-            "Пластик": [0, 50],
+            "Пластик": [50, 50],
         }
     )
     storage1 = await create_storage(db_session, {"Пластик": [0, 60], "Биоотходы": [0, 20]})
@@ -122,7 +122,7 @@ async def test_recycle_no_storage_available(mock_update_storage: AsyncMock,
         db_session,
         name="Test Organisation",
         capacity={
-            "Пластик": [0, 50],
+            "Пластик": [50, 50],
         }
     )
     storage1 = await create_storage(db_session, {"Пластик": [30, 30], "Биоотходы": [20, 20]})
@@ -154,8 +154,8 @@ async def test_recycle_partial_delivery(mock_update_storage: AsyncMock,
         db_session,
         name="Test Organisation",
         capacity={
-            "Пластик": [0, 50],
-            "Биоотходы": [0, 50],
+            "Пластик": [50, 50],
+            "Биоотходы": [50, 50],
         }
     )
     storage1 = await create_storage(db_session, {"Пластик": [10, 30], "Биоотходы": [10, 20]})

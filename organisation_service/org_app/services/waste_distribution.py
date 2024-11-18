@@ -25,7 +25,7 @@ async def find_nearest_storage(db: AsyncSession, organisation_id: int) -> tuple[
 
     storage_plan = {}
     total_sent_waste = {}
-    remaining_waste = {}  # Словарь для отслеживания непоместившихся отходов
+    remaining_waste = {}  # Словарь для отслеживания не поместившихся отходов
     organisation_capacity = organisation.capacity
 
     # Получаем все записи расстояний, связанных с данной организацией
@@ -35,7 +35,7 @@ async def find_nearest_storage(db: AsyncSession, organisation_id: int) -> tuple[
     storage_distances = storage_distances.scalars().all()
 
     for waste_type, (used, total) in organisation_capacity.items():
-        remaining = total - used
+        remaining = used
         if remaining <= 0:
             continue
 
