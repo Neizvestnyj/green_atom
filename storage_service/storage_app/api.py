@@ -99,7 +99,7 @@ async def get_storage_distances(
     return await crud_get_all_storage_distances(db)
 
 
-@router.delete("/{storage_id}/")
+@router.delete("/storage/{storage_id}/")
 async def delete_organisation(storage_id: int, db: AsyncSession = Depends(get_db)) -> JSONResponse:
     """
     Удаление всех организаций.
