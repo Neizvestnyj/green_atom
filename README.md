@@ -134,7 +134,7 @@ docker-compose up -d
 ```
 
 #### 2. Создание хранилища  
-**POST** `/api/v1/storage/storages/`  
+**POST** `/api/v1/storage/storage/`  
 - Создает новое хранилище.  
 
 **Параметры:**  
@@ -170,7 +170,7 @@ docker-compose up -d
 ```
 
 #### 3. Создание записи о расстоянии  
-**POST** `/api/v1/storage/storage_distances/`  
+**POST** `/api/v1/storage/distance/`  
 - Добавляет расстояние между хранилищем и организацией.  
 
 **Параметры:**  
@@ -218,7 +218,7 @@ docker-compose up -d
 ```
 
 #### 5. Получение списка расстояний  
-**GET** `/api/v1/storage/storage_distances/`  
+**GET** `/api/v1/storage/distances/`  
 - Возвращает список всех расстояний между хранилищами и организациями.  
 
 **Пример ответа:**  

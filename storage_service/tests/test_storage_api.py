@@ -29,7 +29,7 @@ async def test_create_storage(mock_send_event: AsyncMock, async_client: AsyncCli
             "Биоотходы": [0, 50]
         }
     }
-    response = await async_client.post("/api/v1/storage/storages/", json=data)
+    response = await async_client.post("/api/v1/storage/storage/", json=data)
 
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["name"] == data["name"]
@@ -59,7 +59,7 @@ async def test_create_already_exist_storage(async_client: AsyncClient, db_sessio
                          location=data['location'],
                          capacity=data['capacity'],
                          )
-    response = await async_client.post("/api/v1/storage/storages/", json=data)
+    response = await async_client.post("/api/v1/storage/storage/", json=data)
     resp_data = response.json()
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -80,7 +80,7 @@ async def test_creat_organisation_without_name(async_client: AsyncClient) -> Non
             "Пластик": [0, 60],
         }
     }
-    response = await async_client.post("/api/v1/storage/storages/", json=data)
+    response = await async_client.post("/api/v1/storage/storage/", json=data)
     resp_data = response.json()
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY

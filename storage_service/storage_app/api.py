@@ -25,7 +25,7 @@ async def health_check():
     return {"status": "OK"}
 
 
-@router.post("/storages/", response_model=StorageSchema)
+@router.post("/storage/", response_model=StorageSchema)
 async def create_storage(
         storage: StorageCreateSchema,
         db: AsyncSession = Depends(get_db),
@@ -46,7 +46,7 @@ async def create_storage(
     return db_storage
 
 
-@router.post("/storage_distances/", response_model=StorageDistanceSchema)
+@router.post("/distance/", response_model=StorageDistanceSchema)
 async def create_storage_distance(
         distance: StorageDistanceBaseSchema,
         db: AsyncSession = Depends(get_db),
@@ -81,7 +81,7 @@ async def get_storages(db: AsyncSession = Depends(get_db)) -> Sequence[Storage]:
     return await crud_get_all_storages(db)
 
 
-@router.get("/storage_distances/", response_model=list[StorageDistanceSchema])
+@router.get("/distances/", response_model=list[StorageDistanceSchema])
 async def get_storage_distances(
         db: AsyncSession = Depends(get_db),
 ) -> Sequence[StorageDistance]:

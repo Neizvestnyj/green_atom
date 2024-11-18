@@ -32,7 +32,7 @@ async def test_create_storage_distance(mock_send_event: AsyncMock,
                                    )
 
     data = {"storage_id": storage.id, "organisation_id": organisation.id, "distance": 100}
-    response = await async_client.post("/api/v1/storage/storage_distances/", json=data)
+    response = await async_client.post("/api/v1/storage/distance/", json=data)
 
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["distance"] == data["distance"]
@@ -60,7 +60,7 @@ async def test_create_already_exist_storage_distance(async_client: AsyncClient,
 
     data = {"storage_id": storage.id, "organisation_id": organisation.id, "distance": 100}
     await create_distance(db_session, **data)
-    response = await async_client.post("/api/v1/storage/storage_distances/", json=data)
+    response = await async_client.post("/api/v1/storage/distance/", json=data)
     resp_data = response.json()
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -78,7 +78,7 @@ async def test_creat_storage_distance_without_organisation_id(async_client: Asyn
 
     data = {"storage_id": 1, "distance": 100}
 
-    response = await async_client.post("/api/v1/storage/storage_distances/", json=data)
+    response = await async_client.post("/api/v1/storage/distance/", json=data)
     resp_data = response.json()
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
@@ -111,7 +111,7 @@ async def test_creat_storage_distance_without_organisation(async_client: AsyncCl
 
     data = {"storage_id": storage.id, "organisation_id": 1, "distance": 100}
 
-    response = await async_client.post("/api/v1/storage/storage_distances/", json=data)
+    response = await async_client.post("/api/v1/storage/distance/", json=data)
     resp_data = response.json()
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -131,7 +131,7 @@ async def test_creat_storage_distance_without_storage(async_client: AsyncClient,
 
     data = {"storage_id": 1, "organisation_id": organisation.id, "distance": 100}
 
-    response = await async_client.post("/api/v1/storage/storage_distances/", json=data)
+    response = await async_client.post("/api/v1/storage/distance/", json=data)
     resp_data = response.json()
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -147,6 +147,6 @@ async def test_get_storage_distances(async_client: AsyncClient) -> None:
     :return: None
     """
 
-    response = await async_client.get("/api/v1/storage/storage_distances/")
+    response = await async_client.get("/api/v1/storage/distances/")
     assert response.status_code == status.HTTP_200_OK
     assert isinstance(response.json(), list)
