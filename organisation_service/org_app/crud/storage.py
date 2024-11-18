@@ -38,6 +38,28 @@ async def get_storage_copy(db: AsyncSession, storage_id: int) -> StorageCopy:
     return result.scalars().first()
 
 
+async def delete_storage(db: AsyncSession, storage_id: int) -> Union[StorageCopy, None]:
+    """
+    Удаление хранилища из БД.
+
+    :param db: асинхронная сессия базы данных
+    :param storage_id: Идентификатор хранилища
+    :return: список удаленных организаций
+    """
+
+    # Получаем все организации
+    result = await db.execute(select(StorageCopy).filter_by(id=storage_id))
+    storage = result.scalars().first()
+
+    if not storage:
+        return None
+
+    await db.delete(storage)
+    await db.commit()
+
+    return storage
+
+
 async def update_storage_copy_capacity(db: AsyncSession, storage_id: int, waste_data: dict) -> Union[StorageCopy, None]:
     """
     Обновляем информацию о хранилище

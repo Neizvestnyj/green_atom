@@ -1,15 +1,17 @@
 from typing import Sequence
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from storage_app.crud.storage import (create_storage as crud_create_storage,
                                       get_all_storages as crud_get_all_storages,
+                                      delete_storage as crud_delete_storage,
                                       )
 from storage_app.crud.storage_distance import (get_all_storage_distances as crud_get_all_storage_distances,
                                                create_storage_distance as crud_create_storage_distance,
                                                )
-from storage_app.events.producers.storage import send_storage_created_event
+from storage_app.events.producers.storage import send_storage_created_event, send_storage_deleted_event
 from storage_app.events.producers.storage_distance import send_storage_distance_created_event
 from storage_app.models.storage import Storage
 from storage_app.models.storage_distance import StorageDistance
@@ -95,3 +97,23 @@ async def get_storage_distances(
     """
 
     return await crud_get_all_storage_distances(db)
+
+
+@router.delete("/{storage_id}/")
+async def delete_organisation(storage_id: int, db: AsyncSession = Depends(get_db)) -> JSONResponse:
+    """
+    Удаление всех организаций.
+
+    :param storage_id: ID хранилища
+    :param db: сессия базы данных
+    :return: список удаленных организаций
+    :raises HTTPException: если организации для удаления не найдены
+    """
+
+    storage = await crud_delete_storage(db, storage_id)
+    if not storage:
+        raise HTTPException(status_code=404, detail="Не найдено хранилища для удаления")
+
+    send_storage_deleted_event(storage)
+
+    return JSONResponse(content={"message": "Хранилище успешно удалено"}, status_code=200)

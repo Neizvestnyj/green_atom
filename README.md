@@ -239,6 +239,17 @@ docker-compose up -d
 ]
 ```
 
+#### 6. Удаление хранилища
+Удаляет каскадно, вместе со `StorageDistance`
+**DELETE** `/api/v1/storage/storages/{ID}`   
+
+**Пример ответа:**  
+```json
+{
+    "message": "Хранилище успешно удалено"
+}
+```
+
 ## Запуск тестов
 
 ```shell
