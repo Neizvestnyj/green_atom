@@ -10,6 +10,7 @@ docker-compose up -d
 ## **API для управления организациями и хранилищами**
 
 ### **Запросы для микросервиса organisation**  
+Тело URL: **/api/v1/organisation/**
 
 #### 1. Проверка статуса сервиса  
 **GET** `/api/v1/organisation/health/`  
@@ -81,8 +82,8 @@ docker-compose up -d
 ]
 ```
 
-#### 4. Удаление всех организаций  
-**DELETE** `/api/v1/organisation/{ID}/`  
+#### 4. Удаление организации
+**DELETE** `/api/v1/organisation/organisation/{ID}/`  
 - Удаляет все организации из базы данных.  
 
 **Пример ответа:**  
@@ -123,6 +124,7 @@ docker-compose up -d
 ---
 
 ### **Запросы для микросервиса storage**  
+Тело URL: **/api/v1/storage/**
 
 #### 1. Проверка статуса сервиса  
 **GET** `/api/v1/storage/health/`  

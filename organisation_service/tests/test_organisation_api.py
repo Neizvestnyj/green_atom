@@ -125,7 +125,7 @@ async def test_delete_empty_organisations(async_client: AsyncClient) -> None:
     :return: None
     """
 
-    response = await async_client.delete(f"/api/v1/organisation/1/")
+    response = await async_client.delete(f"/api/v1/organisation/organisation/1/")
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
     response_json = response.json()
@@ -153,7 +153,7 @@ async def test_delete_all_organisations(mock_send_event: AsyncMock,
                                   "Пластик": [0, 50],
                               },
                               )
-    response = await async_client.delete(f"/api/v1/organisation/{org.id}/")
+    response = await async_client.delete(f"/api/v1/organisation/organisation/{org.id}/")
 
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["message"] == "Организация успешно удалена"

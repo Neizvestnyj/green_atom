@@ -60,10 +60,10 @@ async def get_organisations(db: AsyncSession = Depends(get_db)) -> Sequence[Orga
     return await crud_get_all_organisations(db)
 
 
-@router.delete("/{organisation_id}/")
+@router.delete("/organisation/{organisation_id}/")
 async def delete_organisation(organisation_id: int, db: AsyncSession = Depends(get_db)) -> JSONResponse:
     """
-    Удаление всех организаций.
+    Удаление организации.
 
     :param organisation_id: ID организации
     :param db: сессия базы данных
