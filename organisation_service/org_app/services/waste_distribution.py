@@ -11,7 +11,7 @@ from org_app.models.storage_distance import StorageDistanceCopy
 async def find_nearest_storage(db: AsyncSession, organisation_id: int) -> tuple[
     Dict[int, Dict[str, int]], Dict[str, int], Dict[str, int]]:
     """
-    Найти ближайшие хранилища для утилизации отходов организации и вернуть информацию о переработанных отходах.
+    Функция позволяет найти ближайшие хранилища для утилизации отходов организации и вернуть информацию о переработанных отходах.
 
     :param db: Асинхронная сессия базы данных, используемая для выполнения запросов.
     :param organisation_id: Идентификатор организации, для которой нужно найти ближайшие хранилища.

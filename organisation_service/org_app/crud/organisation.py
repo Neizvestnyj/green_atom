@@ -61,8 +61,10 @@ async def get_organisation(db: AsyncSession, organisation_id: int) -> Organisati
     return result.scalar_one_or_none()
 
 
-async def update_organisation_capacity(db: AsyncSession, organisation_id: int, waste_data: dict) -> Union[
-    Organisation, None]:
+async def update_organisation_capacity(db: AsyncSession,
+                                       organisation_id: int,
+                                       waste_data: dict,
+                                       ) -> Union[Organisation, None]:
     """
     Обновляем информацию об организации
 
@@ -72,7 +74,6 @@ async def update_organisation_capacity(db: AsyncSession, organisation_id: int, w
     :return: Обновленную организацию
     """
 
-    # Используем асинхронный запрос для поиска организации по id
     result = await db.execute(select(Organisation).filter_by(id=organisation_id))
     organisation = result.scalars().first()
 
@@ -93,11 +94,11 @@ async def update_organisation_capacity(db: AsyncSession, organisation_id: int, w
 
 async def delete_organisation(db: AsyncSession, organisation_id: int) -> Union[Organisation, None]:
     """
-    Удаление всех организаций из базы данных.
+    Удаление организации из базы данных по ID.
 
     :param db: асинхронная сессия базы данных
     :param organisation_id: Идентификатор организации
-    :return: список удаленных организаций
+    :return: удаленная организация
     """
 
     # Получаем все организации

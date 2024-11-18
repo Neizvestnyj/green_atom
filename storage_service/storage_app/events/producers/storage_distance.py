@@ -29,11 +29,11 @@ def send_storage_distance_created_event(storage_distance: StorageDistance) -> No
     connection.close()
 
 
-def send_distance_deleted_event(sotrage_distance: StorageDistance) -> None:
+def send_distance_deleted_event(storage_distance: StorageDistance) -> None:
     """
     Отправка события об удалении расстояния.
 
-    :param sotrage_distance: Объект расстояния, для которого отправляется событие
+    :param storage_distance: Объект расстояния, для которого отправляется событие
     :return: None
     """
 
@@ -41,7 +41,7 @@ def send_distance_deleted_event(sotrage_distance: StorageDistance) -> None:
     channel = connection.channel()
 
     channel.queue_declare(queue="distance_delete")
-    message = json.dumps({"id": sotrage_distance.id})
+    message = json.dumps({"id": storage_distance.id})
     channel.basic_publish(exchange="",
                           routing_key="distance_delete",
                           body=message,

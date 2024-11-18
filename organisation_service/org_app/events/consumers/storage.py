@@ -34,8 +34,6 @@ def listen_storage_created_event() -> None:
         :param properties: дополнительные свойства сообщения
         :param body: данные события в виде байт
         :return: None
-
-        Функция извлекает данные из события, а затем инициирует асинхронную обработку.
         """
 
         message = json.loads(body)
@@ -71,7 +69,7 @@ def listen_storage_deleted_event() -> None:
         :param ch: Канал RabbitMQ
         :param method: Метаданные о сообщении
         :param properties: Свойства сообщения
-        :param body: Тело сообщения, содержащее список id организаций для удаления
+        :param body: Тело сообщения, содержащее id хранилища для удаления
         :return: None
         """
 

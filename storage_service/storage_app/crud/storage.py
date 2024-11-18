@@ -12,8 +12,6 @@ from storage_app.schemas.storage import StorageCreateSchema
 
 async def create_storage(db: AsyncSession, storage: StorageCreateSchema) -> Storage:
     """
-    Создание нового хранилища.
-
     :param db: Сессия базы данных
     :param storage: Данные для создания хранилища
     :return: Созданное хранилище
@@ -39,8 +37,6 @@ async def create_storage(db: AsyncSession, storage: StorageCreateSchema) -> Stor
 
 async def get_all_storages(db: AsyncSession) -> Sequence[Storage]:
     """
-    Получение всех хранилищ.
-
     :param db: Сессия базы данных
     :return: Список хранилищ
 
@@ -54,14 +50,11 @@ async def get_all_storages(db: AsyncSession) -> Sequence[Storage]:
 
 async def delete_storage(db: AsyncSession, storage_id: int) -> Union[Storage, None]:
     """
-    Удаление хранилища из базы данных.
-
     :param db: асинхронная сессия базы данных
     :param storage_id: Идентификатор хранилища
-    :return: список удаленных организаций
+    :return: объект удаленного хранилища
     """
 
-    # Получаем все организации
     result = await db.execute(select(Storage).filter_by(id=storage_id))
     storage = result.scalars().first()
 
@@ -76,15 +69,12 @@ async def delete_storage(db: AsyncSession, storage_id: int) -> Union[Storage, No
 
 async def update_storage_capacity(db: AsyncSession, storage_id: int, waste_data: dict) -> Union[Storage, None]:
     """
-    Обновляем информацию о хранилище
-
     :param db: Асинхронная сессия базы данных
     :param storage_id: Идентификатор хранилища
     :param waste_data: Словарь отходов, которые помещены в данное хранилище утилизировать - {"Пластик": 10, "Биоотходы": 50}
     :return: Обновленное хранилище
     """
 
-    # Используем асинхронный запрос для поиска хранилища по id
     result = await db.execute(select(Storage).filter_by(id=storage_id))
     storage = result.scalars().first()
 

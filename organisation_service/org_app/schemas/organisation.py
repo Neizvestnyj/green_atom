@@ -29,7 +29,7 @@ class OrganisationSchema(OrganisationBaseSchema):
 
     :param id: Уникальный идентификатор организации
     :param name: Название организации
-    :param capacity: Словарь типов ресурсов и их ёмкостей
+    :param capacity: Словарь типов отходов и их ёмкостей
     :param model_config: Конфигурация модели для автоматического извлечения значений атрибутов из ORM-модели.
     """
 

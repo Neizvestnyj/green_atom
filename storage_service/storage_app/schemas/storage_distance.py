@@ -7,7 +7,7 @@ class StorageDistanceBaseSchema(BaseModel):
 
     :param storage_id: Идентификатор хранилища.
     :param organisation_id: Идентификатор копии организации.
-    :param distance: Расстояние между хранилищем и организацией (например, в километрах).
+    :param distance: Расстояние между хранилищем и организацией.
     """
 
     storage_id: int

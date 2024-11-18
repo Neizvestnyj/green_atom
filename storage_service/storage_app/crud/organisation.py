@@ -12,8 +12,6 @@ async def create_organisation_copy(db: AsyncSession, organisation: OrganisationC
     :param db: Сессия базы данных
     :param organisation: данные для создания организации
     :return: `OrganisationCopy`
-
-    Создает копию организации в базе данных.
     """
 
     db_org_copy = OrganisationCopy(id=organisation.id)
@@ -30,8 +28,6 @@ async def delete_organisation_by_id(db: AsyncSession, organisation_id: int) -> N
     :param db: Сессия базы данных
     :param organisation_id: Идентификатор организации
     :return: None
-
-    Удаляет организацию и её связанные записи с помощью каскадного удаления.
     """
 
     result = await db.execute(select(OrganisationCopy).filter(OrganisationCopy.id == organisation_id))

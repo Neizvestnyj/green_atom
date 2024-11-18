@@ -35,8 +35,6 @@ async def create_storage(
         db: AsyncSession = Depends(get_db),
 ) -> Storage:
     """
-    Создание нового хранилища.
-
     :param storage: Данные для создания нового хранилища
     :param db: Сессия базы данных
     :return: Созданное хранилище
@@ -56,8 +54,6 @@ async def create_storage_distance(
         db: AsyncSession = Depends(get_db),
 ) -> StorageDistance:
     """
-    Создание записи о расстоянии между хранилищем и организацией.
-
     :param distance: Данные для создания записи о расстоянии
     :param db: Сессия базы данных
     :return: Созданная запись о расстоянии
@@ -74,8 +70,6 @@ async def create_storage_distance(
 @router.get("/storages/", response_model=list[StorageSchema])
 async def get_storages(db: AsyncSession = Depends(get_db)) -> Sequence[Storage]:
     """
-    Получение списка всех хранилищ.
-
     :param db: Сессия базы данных
     :return: Список хранилищ
 
@@ -90,8 +84,6 @@ async def get_storage_distances(
         db: AsyncSession = Depends(get_db),
 ) -> Sequence[StorageDistance]:
     """
-    Получение списка всех записей о расстояниях между хранилищами и организациями.
-
     :param db: Сессия базы данных
     :return: Список записей о расстояниях
 
@@ -102,14 +94,12 @@ async def get_storage_distances(
 
 
 @router.delete("/storage/{storage_id}/")
-async def delete_organisation(storage_id: int, db: AsyncSession = Depends(get_db)) -> JSONResponse:
+async def delete_storage(storage_id: int, db: AsyncSession = Depends(get_db)) -> JSONResponse:
     """
-    Удаление всех организаций.
-
     :param storage_id: ID хранилища
     :param db: сессия базы данных
-    :return: список удаленных организаций
-    :raises HTTPException: если организации для удаления не найдены
+    :return: сообщение о том, что хранилище удалено
+    :raises HTTPException: если организация для удаления не найдены
     """
 
     storage = await crud_delete_storage(db, storage_id)
@@ -122,14 +112,12 @@ async def delete_organisation(storage_id: int, db: AsyncSession = Depends(get_db
 
 
 @router.delete("/distance/{distance_id}/")
-async def delete_organisation(distance_id: int, db: AsyncSession = Depends(get_db)) -> JSONResponse:
+async def delete_storage_distance(distance_id: int, db: AsyncSession = Depends(get_db)) -> JSONResponse:
     """
-    Удаление всех организаций.
-
-    :param distance_id: ID `StorageDistance`
+    :param distance_id: ID расстояния
     :param db: сессия базы данных
-    :return: список удаленных организаций
-    :raises HTTPException: если организации для удаления не найдены
+    :return: сообщение о том, что расстояние удалено
+    :raises HTTPException: если расстояние для удаления не найдены
     """
 
     distance = await crud_delete_distance(db, distance_id)

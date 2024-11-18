@@ -23,7 +23,7 @@ class Organisation(Base):
     # Связь с таблицей копий расстояний
     storage_distances_copy = relationship(
         "StorageDistanceCopy",
-        back_populates="organisation",  # Имя переменной на стороне StorageDistanceCopySchema
+        back_populates="organisation",  # Имя переменной на стороне StorageDistanceCopy
         cascade="all, delete-orphan",  # Удаление зависимых объектов при удалении организации
         single_parent=True,  # Ограничивает создание только одного родительского объекта
     )

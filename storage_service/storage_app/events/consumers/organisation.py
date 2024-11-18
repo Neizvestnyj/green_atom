@@ -49,7 +49,7 @@ def listen_organisation_created_event() -> None:
 
 def listen_organisation_deleted_event() -> None:
     """
-    Слушатель события удаления организации. Удаляет организации по полученному id.
+    Слушатель события удаления организации. Удаляет организацию по полученному id.
 
     :return: None
     """
@@ -60,12 +60,12 @@ def listen_organisation_deleted_event() -> None:
 
     def callback(ch: Channel, method: Basic.Deliver, properties: BasicProperties, body: bytes) -> None:
         """
-        Обработчик сообщений из очереди, который удаляет организации по id.
+        Обработчик сообщений из очереди, который удаляет организацию по id.
 
         :param ch: Канал RabbitMQ
         :param method: Метаданные о сообщении
         :param properties: Свойства сообщения
-        :param body: Тело сообщения, содержащее список id организаций для удаления
+        :param body: Тело сообщения, содержащее id организации для удаления
         :return: None
         """
 

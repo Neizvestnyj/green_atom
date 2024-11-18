@@ -26,7 +26,7 @@ def listen_storage_capacity_event() -> None:
         :param ch: Канал RabbitMQ
         :param method: Метаданные о сообщении
         :param properties: Свойства сообщения
-        :param body: Тело сообщения, содержащее id организации
+        :param body: Тело сообщения, содержащее id организации и новые данные о заполнении хранилища
         :return: None
         """
 
@@ -35,7 +35,6 @@ def listen_storage_capacity_event() -> None:
         updated_capacity = message.get("updated_capacity")
 
         if storage_id and updated_capacity:
-            # Вызов функции для обновления емкости хранилища
             async def handle_event():
                 async with AsyncSessionLocal() as db:
                     await crud_update_storage_capacity(db, storage_id, updated_capacity)

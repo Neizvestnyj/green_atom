@@ -67,7 +67,7 @@ async def delete_organisation(organisation_id: int, db: AsyncSession = Depends(g
 
     :param organisation_id: ID организации
     :param db: сессия базы данных
-    :return: список удаленных организаций
+    :return: сообщение о том, что организация удалена
     :raises HTTPException: если организации для удаления не найдены
     """
 

@@ -39,7 +39,7 @@ async def delete_distance(db: AsyncSession, distance_id: int) -> Union[StorageDi
 
     :param db: асинхронная сессия базы данных
     :param distance_id: Идентификатор хранилища
-    :return: список удаленных организаций
+    :return: удаленное расстояние
     """
 
     result = await db.execute(select(StorageDistanceCopy).filter_by(id=distance_id))

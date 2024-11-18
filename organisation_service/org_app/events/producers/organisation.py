@@ -34,7 +34,7 @@ def send_organisation_delete_event(organisation: Organisation) -> None:
     :param organisation: объект организации, данные которой отправляются в очередь
     :return: None
 
-    Функция формирует и отправляет сообщение с ID удалённых организаций в очередь organisations_delete,
+    Функция формирует и отправляет сообщение с ID удалённой организации в очередь organisations_delete,
     чтобы другие компоненты могли обработать это событие для синхронизации данных.
     """
 

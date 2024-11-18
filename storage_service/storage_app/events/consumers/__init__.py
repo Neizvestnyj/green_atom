@@ -13,4 +13,5 @@ def start_listening_events() -> None:
 
     Thread(target=listen_organisation_created_event, daemon=True).start()
     Thread(target=listen_organisation_deleted_event, daemon=True).start()
+
     Thread(target=listen_storage_capacity_event, daemon=True).start()

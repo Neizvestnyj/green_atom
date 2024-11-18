@@ -9,7 +9,6 @@ from sqlalchemy.pool.base import _ConnectionRecord
 
 from org_app.models import Base
 
-# URL подключения к базе данных
 SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL",
                                     "sqlite+aiosqlite:///../organisation_service.db",
                                     )
@@ -54,8 +53,7 @@ def set_sqlite_pragma(dbapi_connection: AsyncAdapt_aiosqlite_connection, connect
     :param connection_record: запись подключения
     :return: None
 
-    Включает поддержку внешних ключей в базе данных SQLite, что важно для
-    соблюдения ограничений целостности данных.
+    Включает поддержку внешних ключей в базе данных SQLite.
     """
 
     if isinstance(dbapi_connection, AsyncAdapt_aiosqlite_connection):

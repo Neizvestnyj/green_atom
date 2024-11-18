@@ -23,8 +23,6 @@ AsyncSessionLocal = sessionmaker(
 
 async def init_db() -> None:
     """
-    Инициализация базы данных: создание всех таблиц, если они ещё не существуют.
-
     :return: None
 
     Используется для создания всех таблиц, определённых в модели базы данных, при старте приложения.
@@ -37,8 +35,6 @@ async def init_db() -> None:
 
 async def get_db() -> AsyncSession:
     """
-    Функция для получения сессии базы данных.
-
     :return: AsyncSession
 
     Открывает сессию базы данных и предоставляет её для дальнейших операций.
@@ -55,8 +51,7 @@ def set_sqlite_pragma(dbapi_connection: AsyncAdapt_aiosqlite_connection, connect
     :param connection_record: запись подключения
     :return: None
 
-    Включает поддержку внешних ключей в базе данных SQLite, что важно для
-    соблюдения ограничений целостности данных.
+    Включает поддержку внешних ключей в базе данных SQLite.
     """
 
     if isinstance(dbapi_connection, AsyncAdapt_aiosqlite_connection):

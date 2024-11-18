@@ -11,7 +11,7 @@ class StorageDistance(Base):
     :param id: Уникальный идентификатор записи о расстоянии.
     :param storage_id: Идентификатор хранилища (ссылается на `storages.id`).
     :param organisation_id: Идентификатор копии организации (ссылается на `organisations_copy.id`).
-    :param distance: Расстояние между хранилищем и организацией (например, в километрах).
+    :param distance: Расстояние между хранилищем и организацией.
     :param storage: Связь с таблицей `Storage` (хранилище).
     :param organisation: Связь с таблицей `OrganisationCopy` (копия организации).
     """

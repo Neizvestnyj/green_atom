@@ -33,6 +33,7 @@ async def get_storage_copy(db: AsyncSession, storage_id: int) -> StorageCopy:
     :param storage_id: Идентификатор хранилища
     :return: Копия хранилища или None, если копия не найдена
     """
+
     result = await db.execute(select(StorageCopy).where(StorageCopy.id == storage_id))
 
     return result.scalars().first()
@@ -47,7 +48,6 @@ async def delete_storage(db: AsyncSession, storage_id: int) -> Union[StorageCopy
     :return: список удаленных организаций
     """
 
-    # Получаем все организации
     result = await db.execute(select(StorageCopy).filter_by(id=storage_id))
     storage = result.scalars().first()
 
@@ -66,11 +66,10 @@ async def update_storage_copy_capacity(db: AsyncSession, storage_id: int, waste_
 
     :param db: Асинхронная сессия базы данных
     :param storage_id: Идентификатор хранилища
-    :param waste_data: Словарь отходов, которые помещены в данное хранилище утилизировать - {"Пластик": 10, "Биоотходы": 50}
+    :param waste_data: Словарь отходов, которые помещены в данное хранилище - {"Пластик": 10, "Биоотходы": 50}
     :return: Обновленное хранилище
     """
 
-    # Используем асинхронный запрос для поиска организации по id
     result = await db.execute(select(StorageCopy).filter_by(id=storage_id))
     storage = result.scalars().first()
 

@@ -12,8 +12,6 @@ from storage_app.schemas.storage_distance import StorageDistanceBaseSchema
 
 async def create_storage_distance(db: AsyncSession, distance: StorageDistanceBaseSchema) -> StorageDistance:
     """
-    Создание новой записи о расстоянии между хранилищем и организацией.
-
     :param db: Сессия базы данных
     :param distance: Данные для создания записи о расстоянии
     :return: Созданная запись о расстоянии
@@ -63,11 +61,10 @@ async def delete_distance(db: AsyncSession, distance_id: int) -> Union[StorageDi
     Удаление `StorageDistance`.
 
     :param db: асинхронная сессия базы данных
-    :param distance_id: Идентификатор хранилища
-    :return: список удаленных организаций
+    :param distance_id: Идентификатор расстояния
+    :return: обхект удаленного расстояния между ОО и МНО
     """
 
-    # Получаем все организации
     result = await db.execute(select(StorageDistance).filter_by(id=distance_id))
     distance = result.scalars().first()
 
@@ -82,12 +79,10 @@ async def delete_distance(db: AsyncSession, distance_id: int) -> Union[StorageDi
 
 async def get_all_storage_distances(db: AsyncSession) -> Sequence[StorageDistance]:
     """
-    Получение всех записей о расстояниях между хранилищами и организациями.
-
     :param db: Сессия базы данных
     :return: Список записей о расстояниях
 
-    Возвращает список всех записей о расстояниях.
+    Получение всех записей о расстояниях между хранилищами и организациями. Возвращает список всех записей о расстояниях.
     """
 
     result = await db.execute(select(StorageDistance))

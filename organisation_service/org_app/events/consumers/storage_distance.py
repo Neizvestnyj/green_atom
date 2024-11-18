@@ -27,15 +27,11 @@ def listen_storage_distance_created_event() -> None:
 
     def callback(ch: Channel, method: Basic.Deliver, properties: BasicProperties, body: bytes) -> None:
         """
-        Обработчик событий, который вызывает создание копии записи о расстоянии между хранилищем и организацией.
-
         :param ch: канал связи с RabbitMQ
         :param method: информация о доставке сообщения
         :param properties: дополнительные свойства сообщения
         :param body: данные события в виде байт
         :return: None
-
-        Функция извлекает данные из события и инициирует асинхронную обработку.
         """
 
         message = json.loads(body)
@@ -74,12 +70,10 @@ def listen_distance_deleted_event() -> None:
 
     def callback(ch: Channel, method: Basic.Deliver, properties: BasicProperties, body: bytes) -> None:
         """
-        Обработчик сообщений из очереди, который удаляет организации по id.
-
         :param ch: Канал RabbitMQ
         :param method: Метаданные о сообщении
         :param properties: Свойства сообщения
-        :param body: Тело сообщения, содержащее список id организаций для удаления
+        :param body: Тело сообщения, содержащее список id расстояния для удаления
         :return: None
         """
 
