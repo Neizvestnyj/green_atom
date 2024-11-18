@@ -102,7 +102,7 @@ async def create_test_data() -> None:
         oo2 = await create_organisation(client, "ОО2", oo2_capacity)
 
         if oo1[0] != 200 or oo2[0] != 200:
-            raise ValueError('Организации не были созданы')
+            raise ValueError(f"Организации не были созданы {oo1[1]}, {oo2[1]}")
 
         # Создание складов
         storage_capacities = {
@@ -120,7 +120,7 @@ async def create_test_data() -> None:
         for name, details in storage_capacities.items():
             response = await create_storage(client, name, details["location"], details["capacity"])
             if response[0] != 200:
-                raise ValueError(f'Хранилище {name} не было создано')
+                raise ValueError(f'Хранилище {name} не было создано {response[1]}')
             storages[name] = response[1]
 
         # Создание расстояний
