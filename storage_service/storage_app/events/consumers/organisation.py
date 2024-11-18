@@ -38,7 +38,7 @@ def listen_organisation_created_event() -> None:
 
         async def handle_event():
             async with AsyncSessionLocal() as db:
-                org_data = OrganisationCopySchema(id=organisation_id).load(db)
+                org_data = OrganisationCopySchema(id=organisation_id)
                 await create_organisation_copy(db, organisation=org_data)
 
         asyncio.run(handle_event())
