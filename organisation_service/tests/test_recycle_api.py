@@ -13,7 +13,7 @@ async def test_recycle_empty_organisation(async_client: AsyncClient,
                                           db_session: AsyncSession,
                                           ) -> None:
     """
-    Функция создает организацию и два хранилища, затем проверяет перераспределение отходов по хранилищам с учётом расстояний.
+    Проверяем, что пытаемся переработать отходы несуществующей организации
 
     :param async_client: Асинхронный клиент для выполнения HTTP-запросов.
     :param db_session: Сессия базы данных для создания данных в тестах.
@@ -35,7 +35,7 @@ async def test_recycle_all_waste(mock_update_storage: AsyncMock,
                                  async_client: AsyncClient,
                                  db_session: AsyncSession) -> None:
     """
-    Функция создает организацию и два хранилища, затем проверяет перераспределение отходов по хранилищам с учётом расстояний.
+    Проверка полного и корректного распределения отходов
 
     :param mock_update_storage: Мок-функция для отправки события об обновлении ёмкости хранилища.
     :param async_client: Асинхронный клиент для выполнения HTTP-запросов.
@@ -76,7 +76,7 @@ async def test_recycle_all_waste_already_processed(mock_update_storage: AsyncMoc
                                                    async_client: AsyncClient,
                                                    db_session: AsyncSession) -> None:
     """
-    Функция создает организацию и одно хранилище, а затем дважды вызывает перераспределение отходов.
+    Проверяем, что не получится отправить на переработки отходы, если они уже отправлены
 
     :param mock_update_storage: Мок-функция для отправки события об обновлении ёмкости хранилища.
     :param async_client: Асинхронный клиент для выполнения HTTP-запросов.
@@ -110,7 +110,7 @@ async def test_recycle_no_storage_available(mock_update_storage: AsyncMock,
                                             async_client: AsyncClient,
                                             db_session: AsyncSession) -> None:
     """
-    Функция создает организацию и одно хранилище, но оно полностью заполнено.
+    Проверяем, что не можем распределить отходы по хранилищам, так как они заполнены
 
     :param mock_update_storage: Мок-функция для отправки события об обновлении ёмкости хранилища.
     :param async_client: Асинхронный клиент для выполнения HTTP-запросов.
@@ -134,3 +134,37 @@ async def test_recycle_no_storage_available(mock_update_storage: AsyncMock,
     mock_update_storage.assert_not_called()
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert response.json()["detail"] == "Нет доступных хранилищ для утилизации отходов"
+
+
+@pytest.mark.asyncio
+@patch("org_app.api.send_update_capacity_event")
+async def test_recycle_partial_delivery(mock_update_storage: AsyncMock,
+                                        async_client: AsyncClient,
+                                        db_session: AsyncSession) -> None:
+    """
+    Проверяем, что часть отходов может быть доставлена в хранилище, а часть — нет.
+
+    :param mock_update_storage: Мок-функция для отправки события об обновлении ёмкости хранилища.
+    :param async_client: Асинхронный клиент для выполнения HTTP-запросов.
+    :param db_session: Сессия базы данных для создания данных в тестах.
+    :return: None
+    """
+
+    organisation = await create_organisation(
+        db_session,
+        name="Test Organisation",
+        capacity={
+            "Пластик": [0, 50],
+            "Биоотходы": [0, 50],
+        }
+    )
+    storage1 = await create_storage(db_session, {"Пластик": [10, 30], "Биоотходы": [10, 20]})
+    await create_distance(db_session, storage1.id, organisation.id, distance=100)
+
+    data = {"organisation_id": organisation.id}
+    response = await async_client.post("/api/v1/organisation/recycle/", json=data)
+    resp_data = response.json()
+
+    assert response.status_code == status.HTTP_200_OK
+    assert resp_data["message"] == "Отходы частично распределены. Не удалось отправить: {'Пластик': 30, 'Биоотходы': 40} из-за ограничений"
+    assert mock_update_storage.call_count == 1

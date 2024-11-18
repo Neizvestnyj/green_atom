@@ -114,4 +114,12 @@ async def recycle(
         await crud_update_storage_copy_capacity(db, storage_id, updated_capacity)
         send_update_capacity_event(storage_id, updated_capacity)
 
-    return RecycleResponseSchema(storage_plan=storage_plan, message="Отходы были распределены по хранилищам")
+    if remaining_waste:
+        return RecycleResponseSchema(
+            storage_plan=storage_plan,
+            message=f"Отходы частично распределены. Не удалось отправить: {remaining_waste} из-за ограничений"
+        )
+    else:
+        return RecycleResponseSchema(storage_plan=storage_plan,
+                                     message="Отходы были распределены по хранилищам"
+                                     )
