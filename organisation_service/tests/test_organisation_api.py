@@ -27,7 +27,7 @@ async def test_create_organisation(mock_send_event: AsyncMock, async_client: Asy
             "Биоотходы": [0, 50]
         }
     }
-    response = await async_client.post("/api/v1/organisation/organisations/", json=data)
+    response = await async_client.post("/api/v1/organisation/create/", json=data)
     resp_data = response.json()
 
     assert response.status_code == status.HTTP_200_OK
@@ -56,7 +56,7 @@ async def test_create_already_exist_organisation(async_client: AsyncClient, db_s
                               name=data['name'],
                               capacity=data['capacity'],
                               )
-    response = await async_client.post("/api/v1/organisation/organisations/", json=data)
+    response = await async_client.post("/api/v1/organisation/create/", json=data)
     resp_data = response.json()
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -77,7 +77,7 @@ async def test_creat_organisation_without_name(async_client: AsyncClient) -> Non
             "Пластик": [0, 60],
         }
     }
-    response = await async_client.post("/api/v1/organisation/organisations/", json=data)
+    response = await async_client.post("/api/v1/organisation/create/", json=data)
     resp_data = response.json()
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
@@ -110,7 +110,7 @@ async def test_get_organisations(async_client: AsyncClient, db_session: AsyncSes
                               },
                               )
 
-    response = await async_client.get("/api/v1/organisation/organisations/")
+    response = await async_client.get("/api/v1/organisation/list/")
 
     assert response.status_code == status.HTTP_200_OK
     assert isinstance(response.json(), list)
@@ -125,15 +125,15 @@ async def test_delete_empty_organisations(async_client: AsyncClient) -> None:
     :return: None
     """
 
-    response = await async_client.delete("/api/v1/organisation/organisations/")
+    response = await async_client.delete(f"/api/v1/organisation/1/")
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
     response_json = response.json()
-    assert response_json["detail"] == "Не найдено организаций для удаления"
+    assert response_json["detail"] == "Не найдено организации для удаления"
 
 
 @pytest.mark.asyncio
-@patch("org_app.api.send_organisations_delete_event", autospec=True)
+@patch("org_app.api.send_organisation_delete_event", autospec=True)
 async def test_delete_all_organisations(mock_send_event: AsyncMock,
                                         async_client: AsyncClient,
                                         db_session: AsyncSession,
@@ -147,14 +147,14 @@ async def test_delete_all_organisations(mock_send_event: AsyncMock,
     :return: None
     """
 
-    await create_organisation(db_session,
+    org = await create_organisation(db_session,
                               name="New Test Organisation",
                               capacity={
                                   "Пластик": [0, 50],
                               },
                               )
-    response = await async_client.delete("/api/v1/organisation/organisations/")
+    response = await async_client.delete(f"/api/v1/organisation/{org.id}/")
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.json()["message"] == "Все организации успешно удалены"
+    assert response.json()["message"] == "Организация успешно удалена"
     mock_send_event.assert_called_once()

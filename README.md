@@ -21,7 +21,7 @@ docker-compose up -d
 ```
 
 #### 2. Создание организации  
-**POST** `/api/v1/organisation/organisations/`  
+**POST** `/api/v1/organisation/create/`  
 - Создает новую организацию.  
 
 **Параметры:**  
@@ -54,7 +54,7 @@ docker-compose up -d
 ```
 
 #### 3. Получение списка организаций  
-**GET** `/organisations/`  
+**GET** `/api/v1/organisation/list/`  
 - Возвращает список всех организаций.  
 
 **Пример ответа:**  
@@ -82,7 +82,7 @@ docker-compose up -d
 ```
 
 #### 4. Удаление всех организаций  
-**DELETE** `/organisations/`  
+**DELETE** `/api/v1/organisation/{ID}/`  
 - Удаляет все организации из базы данных.  
 
 **Пример ответа:**  
@@ -91,7 +91,7 @@ docker-compose up -d
 ```
 
 #### 5. Запрос на переработку отходов  
-**POST** `/recycle/`  
+**POST** `/api/v1/organisation/recycle/`  
 - Распределяет отходы организации по хранилищам.  
 
 **Параметры:**  

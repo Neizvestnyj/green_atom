@@ -47,7 +47,7 @@ def listen_organisation_created_event() -> None:
     channel.start_consuming()
 
 
-def listen_organisations_deleted_event() -> None:
+def listen_organisation_deleted_event() -> None:
     """
     Слушатель события удаления организации. Удаляет организации по полученному списку id.
 
@@ -56,7 +56,7 @@ def listen_organisations_deleted_event() -> None:
 
     connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_HOST))
     channel = connection.channel()
-    channel.queue_declare(queue="organisations_delete")
+    channel.queue_declare(queue="organisation_delete")
 
     def callback(ch: Channel, method: Basic.Deliver, properties: BasicProperties, body: bytes) -> None:
         """
@@ -70,14 +70,13 @@ def listen_organisations_deleted_event() -> None:
         """
 
         message = json.loads(body)
-        organisation_ids = message["id"]
+        org_id = message["id"]
 
         async def handle_event():
             async with AsyncSessionLocal() as db:
-                for org_id in organisation_ids:
-                    await delete_organisation_by_id(db, org_id)
+                await delete_organisation_by_id(db, org_id)
 
         asyncio.run(handle_event())
 
-    channel.basic_consume(queue="organisations_delete", on_message_callback=callback, auto_ack=True)
+    channel.basic_consume(queue="organisation_delete", on_message_callback=callback, auto_ack=True)
     channel.start_consuming()

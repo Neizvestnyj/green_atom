@@ -91,24 +91,23 @@ async def update_organisation_capacity(db: AsyncSession, organisation_id: int, w
         return None
 
 
-async def delete_all_organisations(db: AsyncSession) -> Sequence[Organisation]:
+async def delete_organisation(db: AsyncSession, organisation_id: int) -> Union[Organisation, None]:
     """
     Удаление всех организаций из базы данных.
 
     :param db: асинхронная сессия базы данных
+    :param organisation_id: Идентификатор организации
     :return: список удаленных организаций
     """
 
     # Получаем все организации
-    result = await db.execute(select(Organisation))
-    organisations = result.scalars().all()
+    result = await db.execute(select(Organisation).filter_by(id=organisation_id))
+    organisation = result.scalars().first()
 
-    if not organisations:
-        return []
+    if not organisation:
+        return None
 
-    # Удаляем все организации
-    for organisation in organisations:
-        await db.delete(organisation)
+    await db.delete(organisation)
     await db.commit()
 
-    return organisations
+    return organisation

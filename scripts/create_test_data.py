@@ -22,7 +22,7 @@ async def create_organisation(
     """
 
     response = await client.post(
-        f"{ORGANISATION_URL}/organisations/",
+        f"{ORGANISATION_URL}/create/",
         json={"name": name, "capacity": capacity}
     )
 

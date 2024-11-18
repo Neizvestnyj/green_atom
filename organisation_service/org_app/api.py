@@ -7,12 +7,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from org_app.crud.organisation import (create_organisation as crud_create_organisation,
                                        get_all_organisations as crud_get_all_organisations,
-                                       delete_all_organisations as crud_delete_all_organisations,
+                                       delete_organisation as crud_delete_organisation,
                                        update_organisation_capacity as crud_update_organisation_capacity,
                                        )
 from org_app.crud.storage import update_storage_copy_capacity as crud_update_storage_copy_capacity
 from org_app.events.producers.organisation import (send_organisation_created_event,
-                                                   send_organisations_delete_event,
+                                                   send_organisation_delete_event,
                                                    )
 from org_app.events.producers.storage import send_update_capacity_event
 from org_app.models.organisation import Organisation
@@ -29,7 +29,7 @@ async def health_check():
     return {"status": "OK"}
 
 
-@router.post("/organisations/", response_model=OrganisationSchema)
+@router.post("/create/", response_model=OrganisationSchema)
 async def create_organisation(
         org: OrganisationCreateSchema,
         db: AsyncSession = Depends(get_db),
@@ -48,7 +48,7 @@ async def create_organisation(
     return organisation
 
 
-@router.get("/organisations/", response_model=list[OrganisationSchema])
+@router.get("/list/", response_model=list[OrganisationSchema])
 async def get_organisations(db: AsyncSession = Depends(get_db)) -> Sequence[Organisation]:
     """
     Получение списка всех организаций.
@@ -60,23 +60,24 @@ async def get_organisations(db: AsyncSession = Depends(get_db)) -> Sequence[Orga
     return await crud_get_all_organisations(db)
 
 
-@router.delete("/organisations/")
-async def delete_all_organisations(db: AsyncSession = Depends(get_db)) -> JSONResponse:
+@router.delete("/{organisation_id}/")
+async def delete_organisation(organisation_id: int, db: AsyncSession = Depends(get_db)) -> JSONResponse:
     """
     Удаление всех организаций.
 
+    :param organisation_id: ID организации
     :param db: сессия базы данных
     :return: список удаленных организаций
     :raises HTTPException: если организации для удаления не найдены
     """
 
-    organisations = await crud_delete_all_organisations(db)
-    if not organisations:
-        raise HTTPException(status_code=404, detail="Не найдено организаций для удаления")
+    organisation = await crud_delete_organisation(db, organisation_id)
+    if not organisation:
+        raise HTTPException(status_code=404, detail="Не найдено организации для удаления")
 
-    send_organisations_delete_event(organisations)
+    send_organisation_delete_event(organisation)
 
-    return JSONResponse(content={"message": "Все организации успешно удалены"}, status_code=200)
+    return JSONResponse(content={"message": "Организация успешно удалена"}, status_code=200)
 
 
 @router.post("/recycle/", response_model=RecycleResponseSchema)
