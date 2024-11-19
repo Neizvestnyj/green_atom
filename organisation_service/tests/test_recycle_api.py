@@ -30,6 +30,36 @@ async def test_recycle_empty_organisation(async_client: AsyncClient,
 
 
 @pytest.mark.asyncio
+async def test_recycle_with_wrong_id_type(async_client: AsyncClient,
+                                          db_session: AsyncSession,
+                                          ) -> None:
+    """
+    Проверяем, что при вводе некорректного типа ID организации выведется ошибка
+
+    :param async_client: Асинхронный клиент для выполнения HTTP-запросов.
+    :param db_session: Сессия базы данных для создания данных в тестах.
+    :return: None
+    """
+
+    data = {"organisation_id": "NOT ID"}
+
+    response = await async_client.post("/api/v1/organisation/recycle/", json=data)
+    resp_data = response.json()
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    missing_name_error = next(
+        (
+            error
+            for error in resp_data["detail"]
+            if error["type"] == "int_parsing" and "organisation_id" in error["loc"]
+        ),
+        None,
+    )
+    assert missing_name_error is not None
+    assert missing_name_error["msg"] == "Input should be a valid integer, unable to parse string as an integer"
+
+
+@pytest.mark.asyncio
 @patch("org_app.api.send_update_capacity_event")
 async def test_recycle_all_waste(mock_update_storage: AsyncMock,
                                  async_client: AsyncClient,

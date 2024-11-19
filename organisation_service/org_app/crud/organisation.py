@@ -26,6 +26,14 @@ async def create_organisation(db: AsyncSession, org: OrganisationCreateSchema) -
             detail=f"Организация с именем {org.name} уже существует",
         )
 
+    # Проверяем, чтобы количество отходов не превышало вместимость
+    for waste_type, values in org.capacity.items():
+        if values[0] > values[1]:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Переполнение для отхода {waste_type}: {values[0]} превышает вместимость {values[1]}"
+            )
+
     db_org = Organisation(name=org.name, capacity=org.capacity)
     db.add(db_org)
     await db.commit()
