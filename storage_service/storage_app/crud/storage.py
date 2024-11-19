@@ -27,6 +27,14 @@ async def create_storage(db: AsyncSession, storage: StorageCreateSchema) -> Stor
             detail=f"Хранилище с именем {storage.name} уже существует",
         )
 
+    # Проверяем, чтобы количество отходов не превышало вместимость
+    for waste_type, values in storage.capacity.items():
+        if values[0] > values[1]:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Переполнение для отхода {waste_type}: {values[0]} превышает вместимость {values[1]}"
+            )
+
     db_storage = Storage(name=storage.name, location=storage.location, capacity=storage.capacity)
     db.add(db_storage)
     await db.commit()

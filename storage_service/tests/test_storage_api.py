@@ -8,6 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from .factories import create_storage
 
 
+############################# CREATE ###################################
+
 @pytest.mark.asyncio
 @patch("storage_app.api.send_storage_created_event", autospec=True)
 async def test_create_storage(mock_send_event: AsyncMock, async_client: AsyncClient) -> None:
@@ -97,6 +99,65 @@ async def test_creat_organisation_without_name(async_client: AsyncClient) -> Non
 
 
 @pytest.mark.asyncio
+async def test_creat_storage_with_incorrect_name_type(async_client: AsyncClient) -> None:
+    """
+    Функция тестирует что тип name неверен.
+
+    :param async_client: Асинхронный клиент для выполнения HTTP-запросов.
+    :return: None
+    """
+
+    data = {
+        "name": 123,
+        "location": "Москва",
+        "capacity": {
+            "Пластик": [0, 60],
+        }
+    }
+
+    response = await async_client.post("/api/v1/storage/storage/", json=data)
+    resp_data = response.json()
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    missing_name_error = next(
+        (
+            error
+            for error in resp_data["detail"]
+            if error["type"] == "string_type" and "name" in error["loc"]
+        ),
+        None,
+    )
+    assert missing_name_error is not None
+    assert missing_name_error["msg"] == "Input should be a valid string"
+
+@pytest.mark.asyncio
+async def test_creat_storage_with_overflow_capacity(async_client: AsyncClient) -> None:
+    """
+    Проверяем, что не можем создать организацию с переполненной вместимостью
+
+    :param async_client: Асинхронный клиент для выполнения HTTP-запросов.
+    :return: None
+    """
+
+    data = {
+        "name": "Test organisation",
+        "location": "Москва",
+        "capacity": {
+            "Пластик": [70, 60],
+            "Стекло": [0, 20],
+            "Биоотходы": [90, 50]
+        }
+    }
+    response = await async_client.post("/api/v1/storage/storage/", json=data)
+    resp_data = response.json()
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert resp_data["detail"] == "Переполнение для отхода Пластик: 70 превышает вместимость 60"
+
+
+############################# GET ###################################
+
+@pytest.mark.asyncio
 async def test_get_storages(async_client: AsyncClient) -> None:
     """
     Функция проверяет правильность работы эндпоинта для получения списка всех хранилищ.
@@ -110,6 +171,8 @@ async def test_get_storages(async_client: AsyncClient) -> None:
     assert response.status_code == status.HTTP_200_OK
     assert isinstance(response.json(), list)
 
+
+############################# GET ###################################
 
 @pytest.mark.asyncio
 async def test_delete_empty_storage(async_client: AsyncClient) -> None:
@@ -127,14 +190,16 @@ async def test_delete_empty_storage(async_client: AsyncClient) -> None:
     assert response_json["detail"] == "Не найдено хранилища для удаления"
 
 
+############################# DELETE ###################################
+
 @pytest.mark.asyncio
 @patch("storage_app.api.send_storage_deleted_event", autospec=True)
-async def test_delete_all_organisations(mock_send_event: AsyncMock,
-                                        async_client: AsyncClient,
-                                        db_session: AsyncSession,
-                                        ) -> None:
+async def test_delete_storage(mock_send_event: AsyncMock,
+                              async_client: AsyncClient,
+                              db_session: AsyncSession,
+                              ) -> None:
     """
-    Функция создает организацию, а затем проверяет, что событие о ее удалении было отправлено после успешного удаления.
+    Проверяем удаление Хранилища
 
     :param mock_send_event: Мок-функция для отправки события об удалении всех организаций.
     :param async_client: Асинхронный клиент для выполнения HTTP-запросов.
@@ -160,3 +225,27 @@ async def test_delete_all_organisations(mock_send_event: AsyncMock,
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["message"] == "Хранилище успешно удалено"
     mock_send_event.assert_called_once()
+
+@pytest.mark.asyncio
+async def test_delete_storage_with_incorrect_id_type(async_client: AsyncClient) -> None:
+    """
+    Функция тестирует, что ID хранилища для удаления неверно.
+
+    :param async_client: Асинхронный клиент для выполнения HTTP-запросов.
+    :return: None
+    """
+
+    response = await async_client.delete(f"/api/v1/storage/storage/FAKE_ID/")
+    resp_data = response.json()
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    missing_name_error = next(
+        (
+            error
+            for error in resp_data["detail"]
+            if error["type"] == "int_parsing" and "storage_id" in error["loc"]
+        ),
+        None,
+    )
+    assert missing_name_error is not None
+    assert missing_name_error["msg"] == "Input should be a valid integer, unable to parse string as an integer"

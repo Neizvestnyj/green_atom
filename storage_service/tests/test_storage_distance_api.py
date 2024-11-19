@@ -8,6 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from .factories import create_organisation, create_storage, create_distance
 
 
+############################# CREATE ###################################
+
 @pytest.mark.asyncio
 @patch("storage_app.api.send_storage_distance_created_event")
 async def test_create_storage_distance(mock_send_event: AsyncMock,
@@ -139,6 +141,35 @@ async def test_creat_storage_distance_without_storage(async_client: AsyncClient,
 
 
 @pytest.mark.asyncio
+async def test_creat_distance_with_incorrect_org_id_type(async_client: AsyncClient) -> None:
+    """
+    Функция тестирует что тип `organisation_id` неверен.
+
+    :param async_client: Асинхронный клиент для выполнения HTTP-запросов.
+    :return: None
+    """
+
+    data = {"storage_id": 1, "organisation_id": 'FAKE_ID', "distance": 100}
+
+    response = await async_client.post("/api/v1/storage/distance/", json=data)
+    resp_data = response.json()
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    missing_name_error = next(
+        (
+            error
+            for error in resp_data["detail"]
+            if error["type"] == "int_parsing" and "organisation_id" in error["loc"]
+        ),
+        None,
+    )
+    assert missing_name_error is not None
+    assert missing_name_error["msg"] == "Input should be a valid integer, unable to parse string as an integer"
+
+
+############################# GET ###################################
+
+@pytest.mark.asyncio
 async def test_get_storage_distances(async_client: AsyncClient) -> None:
     """
     Функция проверяет правильность работы эндпоинта для получения списка всех `StorageDistance`.
@@ -151,6 +182,8 @@ async def test_get_storage_distances(async_client: AsyncClient) -> None:
     assert response.status_code == status.HTTP_200_OK
     assert isinstance(response.json(), list)
 
+
+############################# DELETE ###################################
 
 @pytest.mark.asyncio
 async def test_delete_empty_distance(async_client: AsyncClient) -> None:
@@ -198,3 +231,28 @@ async def test_delete_distance(mock_send_event: AsyncMock,
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["message"] == "Расстояние между ОО и МНО успешно удалено"
     mock_send_event.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_delete_distance_with_incorrect_id_type(async_client: AsyncClient) -> None:
+    """
+    Функция тестирует, что ID хранилища для удаления неверно.
+
+    :param async_client: Асинхронный клиент для выполнения HTTP-запросов.
+    :return: None
+    """
+
+    response = await async_client.delete(f"/api/v1/storage/distance/FAKE_ID/")
+    resp_data = response.json()
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    missing_name_error = next(
+        (
+            error
+            for error in resp_data["detail"]
+            if error["type"] == "int_parsing" and "distance_id" in error["loc"]
+        ),
+        None,
+    )
+    assert missing_name_error is not None
+    assert missing_name_error["msg"] == "Input should be a valid integer, unable to parse string as an integer"
